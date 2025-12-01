@@ -1,24 +1,17 @@
-use crate::tools::math::{matrix::{Mat3, Matrix}, vector::*};
+use crate::{
+    rendering::application::*,
+};
 
-mod tools {
-    pub mod math {
-        pub mod vector;
-        pub mod matrix; 
-    }
+mod rendering {
+    pub mod application;
 }
 
 fn main() {
+    let app: App = App::create(
+        WindowProps::new(String::from("Horizon"), [0.45, 0.3, 0.65, 1.0])
+    );
 
-    let my_vec_a: Vector = Vector::Length4(Vec4::new([1.0, 2.0, 3.0, 4.0]));
-    let my_vec_b: Vector = Vector::Length3(Vec3::new([4.0, 5.0, 6.0]));
+    let my_val: bool = true;
 
-    let my_mat: Matrix = Matrix::SquareLength3(Mat3::new([
-        1.0, 0.0, 0.0,
-        0.0, 1.0, 0.0,
-        0.0, 0.0, 1.0,
-    ]));
-
-    let res_vec: Vector = my_vec_a + my_vec_b;
-    println!("resulting vector = {:?}", res_vec);
-    println!("Matrix: {:?}", my_mat);
+    app.main_loop();
 }

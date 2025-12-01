@@ -15,6 +15,50 @@ pub enum Matrix {
     SquareLength2(Mat2),
 }
 
+impl Matrixable for Matrix {
+    fn get(&self, row: usize, col: usize) -> &f32 {
+        match self {
+            Self::SquareLength2(mat2) => {
+                mat2.get(row, col)
+            }
+            Self::SquareLength3(mat3) => {
+                mat3.get(row, col)
+            }
+            Self::SquareLength4(mat4) => {
+                mat4.get(row, col)
+            }
+        }
+    }
+
+    fn row(&self, col: usize) -> Vector {
+        match self {
+            Self::SquareLength2(mat2) => {
+                mat2.row(col)
+            }
+            Self::SquareLength3(mat3) => {
+                mat3.row(col)
+            }
+            Self::SquareLength4(mat4) => {
+                mat4.row(col)
+            }
+        }
+    }
+
+    fn col(&self, row: usize) -> Vector {
+        match self {
+            Self::SquareLength2(mat2) => {
+                mat2.col(row)
+            }
+            Self::SquareLength3(mat3) => {
+                mat3.col(row)
+            }
+            Self::SquareLength4(mat4) => {
+                mat4.col(row)
+            }
+        }
+    }
+}
+
 #[allow(unused)]
 #[derive(Debug, Clone)]
 pub struct Mat4 {
