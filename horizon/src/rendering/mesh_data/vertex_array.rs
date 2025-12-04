@@ -1,19 +1,14 @@
 use gl::{types::*};
 
-use crate::rendering::mesh_data::buffer::*;
 
 #[allow(unused)]
 pub struct VertexArray {
     pub id: GLuint,
-    array_buffer: Buffer,
-    index_buffer: Buffer,
 }
 
 #[allow(unused)]
 impl VertexArray {
-    pub fn new(array_buffer: Buffer, index_buffer: Buffer) -> Self {
-        array_buffer.bind();
-        index_buffer.bind();
+    pub fn new() -> Self {
 
         let mut id = 0;
         unsafe {
@@ -21,13 +16,8 @@ impl VertexArray {
             gl::BindVertexArray(id);
         }
 
-        array_buffer.unbind();
-        index_buffer.unbind();
-
         Self {
             id: id,
-            index_buffer: index_buffer,
-            array_buffer: array_buffer,
         }
     }
 
@@ -40,6 +30,26 @@ impl VertexArray {
     pub fn unbind() {
         unsafe {
             gl::BindVertexArray(0);
+        }
+    }
+
+    pub fn set_attribute<V: Sized>(
+        &self,
+        attrib_pos: GLuint,
+        components: GLint,
+        offset: GLint,
+    ) {
+        self.bind();
+        unsafe {
+            gl::VertexAttribPointer(
+                attrib_pos, 
+                components, 
+                gl::FLOAT, 
+                gl::FALSE, 
+                std::mem::size_of::<V>() as GLint, 
+                offset as *const _,
+            );
+            gl::EnableVertexAttribArray(attrib_pos);
         }
     }
 }

@@ -2,15 +2,23 @@
 330 core
 
 [vertex]
-layout (location = 0) in vec3 loc;
+in vec3 loc;
+in vec2 vertTexCoords;
+
+out vec2 texCoord;
 
 void main() {
     gl_Position = vec4(loc, 1.0);
+    texCoord = vertTexCoords;
 }
 
 [fragment]
 out vec4 FragColor;
 
+in vec2 texCoord;
+
+uniform sampler2D texture0;
+
 void main() {
-    FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    FragColor = texture(texture0, texCoord);
 }

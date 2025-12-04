@@ -5,6 +5,8 @@ use glutin::event::*;
 use glutin::event_loop::*;
 use glutin::window::*;
 
+use crate::rendering::renderer::Renderer;
+
 pub struct WindowProps {
     title: String,
     base_color: [f32; 4]
@@ -24,6 +26,7 @@ pub struct App {
     event_loop: EventLoop<()>,
     context: ContextWrapper<PossiblyCurrent, Window>,
     window_props: WindowProps,
+    pub renderer: Renderer,
 }
 
 #[allow(unused)]
@@ -46,10 +49,16 @@ impl App {
 
         gl::load_with(|ptr| gl_context.get_proc_address(ptr) as *const _);
 
+        unsafe {
+            gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
+            gl::Enable(gl::BLEND);
+        }
+
         Self  {
             event_loop: event_loop,
             context: gl_context,
-            window_props: props
+            window_props: props,
+            renderer: Renderer::new(),
         }
     }
 
@@ -75,6 +84,9 @@ impl App {
                         );
                         gl::Clear(gl::COLOR_BUFFER_BIT);
                     }
+
+                    self.renderer.draw_requests();
+
                     self.context.swap_buffers().unwrap();
                 },
 

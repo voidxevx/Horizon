@@ -1,5 +1,4 @@
-use crate::{rendering::mesh_data::{buffer::Buffer, shader::*, vertex_array::VertexArray}, tools::math::vector::Vec3};
-use gl::types::*;
+use crate::{rendering::mesh_data::{buffer::Buffer, shader::*, texture::{Texture}, vertex_array::VertexArray}, tools::math::vector::{Vec2, Vec3}};
 
 #[allow(unused)]
 use crate::{
@@ -15,41 +14,60 @@ mod tools {
 
 mod rendering {
     pub mod application;
+    pub mod renderer;
     pub mod mesh_data {
         pub mod buffer;
         pub mod shader;
         pub mod vertex_array;
+        pub mod texture;
     }
 }
 
-struct Vertex(Vec3);
+#[allow(unused)]
+#[repr(C, packed)]
+struct Vertex(Vec3, Vec2);
+
 
 fn main() {
-    let app: App = App::create(
+    let mut app: App = App::create(
         WindowProps::new(String::from("Horizon"), [0.0, 0.0, 0.0, 1.0])
     );
 
-    let _test_shader: ShaderProgram = generate_shader("./content/shaders/default.shader")
-        .expect("Error creating shader.");
-
-    let triangle_mesh: [Vertex; 3] = [
-        Vertex(Vec3::new([1.0, 1.0, 1.0])),
-        Vertex(Vec3::new([0.0, 1.0, 1.0])),
-        Vertex(Vec3::new([1.0, 0.0, 1.0]))
+    let mesh: [Vertex; 4] = [
+        Vertex(Vec3::new([-0.5, -0.5, 1.0]), Vec2::new([0.0, 1.0])),
+        Vertex(Vec3::new([ 0.5, -0.5, 1.0]), Vec2::new([1.0, 1.0])),
+        Vertex(Vec3::new([ 0.5,  0.5, 1.0]), Vec2::new([1.0, 0.0])),
+        Vertex(Vec3::new([-0.5,  0.5, 1.0]), Vec2::new([0.0, 0.0])),
     ];
 
-    let triangle_indecis: [GLuint; 3] = [
-        0, 1, 2
+    let indeces: [i32; 6] = [
+        0, 1, 2,
+        2, 3, 0,
     ];
 
-    let test_buffer: Buffer = Buffer::new(gl::ARRAY_BUFFER);
-    let index_buffer: Buffer = Buffer::new(gl::ELEMENT_ARRAY_BUFFER);
-    test_buffer.buffer_data(&triangle_mesh, gl::STATIC_DRAW);
-    index_buffer.buffer_data(&triangle_indecis, gl::STATIC_DRAW);
 
-    let vertex_array: VertexArray = VertexArray::new(test_buffer, index_buffer);
+    let shader = generate_shader("./content/shaders/default.shader").unwrap();
 
+    let vertex_array = VertexArray::new();
     vertex_array.bind();
+
+    let vertex_buffer = Buffer::new(gl::ARRAY_BUFFER);
+    vertex_buffer.buffer_data(&mesh, gl::STATIC_DRAW);
+
+    let index_buffer = Buffer::new(gl::ELEMENT_ARRAY_BUFFER);
+    index_buffer.buffer_data(&indeces, gl::STATIC_DRAW);
+
+    let loc_attrib = shader.get_attrib_location("loc").expect("attribute not found");
+    set_attribute!(vertex_array, loc_attrib, Vertex::0);
+    let tex_attrib = shader.get_attrib_location("vertTexCoords").expect("attribute not found");
+    set_attribute!(vertex_array, tex_attrib, Vertex::1);
+
+    let texture = Texture::new();
+    texture.set_wrapping(gl::REPEAT);
+    texture.load("./content/textures/tetosphere.png").expect("unable to load texture");
+    shader.set_int_uniform("texture0", 0).expect("unable to set uniform");
+
+    app.renderer.add_request(vertex_array, shader, texture);
 
     app.main_loop();
 }
