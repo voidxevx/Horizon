@@ -7,6 +7,8 @@ use std::string::FromUtf8Error;
 use gl::types::*;
 use std::path::Path;
 
+use crate::tools::math::matrix::{Mat4, Matrix};
+
 #[allow(unused)]
 #[derive(Debug, Error)]
 pub enum ShaderError {
@@ -133,6 +135,30 @@ impl ShaderProgram {
             let uniform = CString::new(name)?;
             gl::Uniform1i(gl::GetUniformLocation(self.id, uniform.as_ptr()), value);
             Ok(())
+        }
+    }
+
+    pub fn set_mat_uniform(&self, name: &str, value: Matrix) -> Result<(), ShaderError> {
+        unsafe {
+            match value {
+                Matrix::SquareLength2(mat2) => {
+                    Ok(())
+                },
+                Matrix::SquareLength3(mat3) => {
+                    Ok(())
+                }
+                Matrix::SquareLength4(mat4) => {
+                    self.apply();
+                    let uniform: CString = CString::new(name)?;
+                    gl::UniformMatrix4fv(
+                        gl::GetUniformLocation(self.id, uniform.as_ptr()),
+                        1, 
+                        gl::FALSE,
+                        mat4.data.as_ptr()
+                    );
+                    Ok(())
+                }
+            }
         }
     }
 }

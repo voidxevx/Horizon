@@ -8,7 +8,7 @@ pub trait Matrixable {
 }
 
 #[allow(unused)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum Matrix {
     SquareLength4(Mat4),
     SquareLength3(Mat3),
@@ -60,9 +60,9 @@ impl Matrixable for Matrix {
 }
 
 #[allow(unused)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Mat4 {
-    data: [f32; 16]
+    pub data: [f32; 16]
 }
 
 #[allow(unused)]
@@ -110,9 +110,9 @@ impl Matrixable for Mat4 {
 }
 
 #[allow(unused)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Mat3 {
-    data: [f32; 9]
+    pub data: [f32; 9]
 }
 
 #[allow(unused)]
@@ -159,9 +159,9 @@ impl Matrixable for Mat3 {
 }
 
 #[allow(unused)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Mat2 {
-    data: [f32; 4]
+    pub data: [f32; 4]
 }
 
 #[allow(unused)]

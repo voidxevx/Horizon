@@ -1,11 +1,14 @@
 use glutin::ContextBuilder;
 use glutin::ContextWrapper;
 use glutin::PossiblyCurrent;
+use glutin::dpi::PhysicalSize;
 use glutin::event::*;
 use glutin::event_loop::*;
 use glutin::window::*;
 
+use crate::rendering::camera::Camera;
 use crate::rendering::renderer::Renderer;
+use crate::tools::math;
 
 pub struct WindowProps {
     title: String,
@@ -26,6 +29,7 @@ pub struct App {
     event_loop: EventLoop<()>,
     context: ContextWrapper<PossiblyCurrent, Window>,
     window_props: WindowProps,
+    camera: Camera,
     pub renderer: Renderer,
 }
 
@@ -58,19 +62,48 @@ impl App {
             event_loop: event_loop,
             context: gl_context,
             window_props: props,
+            camera: Camera::None,
             renderer: Renderer::new(),
         }
     }
 
+    pub fn attach_camera(&mut self, camera: Camera) {
+        self.camera = camera;
+    }
+
     pub fn main_loop(self) {
-        self.event_loop.run(move |event, _, control_flow| {
-            *control_flow = ControlFlow::Wait;
+        self.event_loop.run( move |event, _, control_flow| {
+            *control_flow = ControlFlow::Poll;
+        
+            let mut camera = self.camera;
 
             match event {
                 Event::LoopDestroyed => (),
                 Event::WindowEvent {event, .. } => match event {
                     WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
-                    WindowEvent::Resized(physical_size) => self.context.resize(physical_size),
+                    WindowEvent::Resized(physical_size) => {
+                        self.context.resize(physical_size);
+
+                        match camera {
+                            Camera::Orthographic(mut ortho) => {
+                                println!("{:?}", ortho);
+                                ortho.update_view_matrix(
+                                    physical_size.width as f32,
+                                    physical_size.height as f32,
+                                );
+                            },
+                            _ => (),
+                        }
+
+                        unsafe {
+                            gl::Viewport(
+                                0,
+                                0,
+                                physical_size.width as i32,
+                                physical_size.height as i32,
+                            );
+                        }
+                    },
                     _ => (),
                 },
 
@@ -85,7 +118,7 @@ impl App {
                         gl::Clear(gl::COLOR_BUFFER_BIT);
                     }
 
-                    self.renderer.draw_requests();
+                    self.renderer.draw_requests(camera);
 
                     self.context.swap_buffers().unwrap();
                 },

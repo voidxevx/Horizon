@@ -132,7 +132,7 @@ pub trait Vectorable<T = Self> {
 #[allow(unused)]
 #[derive(Debug, Clone)]
 pub struct Vec4 {
-    data: [f32; 4]
+    pub data: [f32; 4]
 }
 
 /* constructor */
@@ -275,7 +275,7 @@ impl Vectorable for Vec4
 #[allow(unused)]
 #[derive(Debug, clone::Clone)]
 pub struct Vec3 { 
-    data: [f32; 3 ] 
+    pub data: [f32; 3 ] 
 }
 
 /* constructor */
@@ -425,7 +425,7 @@ impl Vectorable for Vec3
 #[allow(unused)]
 #[derive(Debug, Clone)]
 pub struct Vec2 {
-    data: [f32; 2]
+    pub data: [f32; 2]
 }
 
 /* constructor */

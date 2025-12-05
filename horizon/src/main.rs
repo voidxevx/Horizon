@@ -1,4 +1,4 @@
-use crate::{rendering::mesh_data::{buffer::Buffer, shader::*, texture::{Texture}, vertex_array::VertexArray}, tools::math::vector::{Vec2, Vec3}};
+use crate::{rendering::{camera::OrthographicCamera, camera::Camera, mesh_data::{buffer::Buffer, shader::*, texture::Texture, vertex_array::VertexArray}}, tools::math::{matrix::Matrix, transforms::{orthographic_matrix, rotation_mat4_euler_z, scalar_matrix, translation_matrix}, vector::{Vec2, Vec3, Vec4, Vector}}};
 
 #[allow(unused)]
 use crate::{
@@ -9,12 +9,15 @@ use crate::{
 mod tools {
     pub mod math{
         pub mod vector;
+        pub mod matrix;
+        pub mod transforms;
     }
 }
 
 mod rendering {
     pub mod application;
     pub mod renderer;
+    pub mod camera;
     pub mod mesh_data {
         pub mod buffer;
         pub mod shader;
@@ -34,10 +37,10 @@ fn main() {
     );
 
     let mesh: [Vertex; 4] = [
-        Vertex(Vec3::new([-0.5, -0.5, 1.0]), Vec2::new([0.0, 1.0])),
-        Vertex(Vec3::new([ 0.5, -0.5, 1.0]), Vec2::new([1.0, 1.0])),
-        Vertex(Vec3::new([ 0.5,  0.5, 1.0]), Vec2::new([1.0, 0.0])),
-        Vertex(Vec3::new([-0.5,  0.5, 1.0]), Vec2::new([0.0, 0.0])),
+        Vertex(Vec3::new([0.0,   0.0,   0.0]), Vec2::new([0.0, 1.0])),
+        Vertex(Vec3::new([100.0, 0.0,   0.0]), Vec2::new([1.0, 1.0])),
+        Vertex(Vec3::new([100.0, 100.0, 0.0]), Vec2::new([1.0, 0.0])),
+        Vertex(Vec3::new([0.0,   100.0, 0.0]), Vec2::new([0.0, 0.0])),
     ];
 
     let indeces: [i32; 6] = [
@@ -69,5 +72,7 @@ fn main() {
 
     app.renderer.add_request(vertex_array, shader, texture);
 
+    let camera: Camera = Camera::Orthographic(OrthographicCamera::new(720.0, 640.0));
+    app.attach_camera(camera);
     app.main_loop();
 }
