@@ -7,7 +7,7 @@ use std::string::FromUtf8Error;
 use gl::types::*;
 use std::path::Path;
 
-use crate::tools::math::matrix::{Mat4, Matrix};
+use crate::tools::math::matrix::{Matrix};
 
 #[allow(unused)]
 #[derive(Debug, Error)]

@@ -1,4 +1,25 @@
-use crate::{rendering::{camera::OrthographicCamera, camera::Camera, mesh_data::{buffer::Buffer, shader::*, texture::Texture, vertex_array::VertexArray}}, tools::math::{matrix::Matrix, transforms::{orthographic_matrix, rotation_mat4_euler_z, scalar_matrix, translation_matrix}, vector::{Vec2, Vec3, Vec4, Vector}}};
+use crate::{
+    rendering::{
+        camera::{
+            Camera, 
+            OrthographicCamera
+        },
+
+        mesh_data::{
+            buffer::Buffer, 
+            shader::*, 
+            texture::Texture, 
+            vertex_array::VertexArray
+        },
+        
+        renderer::Renderer
+    },
+
+    tools::math::vector::{
+        Vec2, 
+        Vec3
+    }
+};
 
 #[allow(unused)]
 use crate::{
@@ -32,10 +53,13 @@ struct Vertex(Vec3, Vec2);
 
 
 fn main() {
-    let mut app: App = App::create(
-        WindowProps::new(String::from("Horizon"), [0.0, 0.0, 0.0, 1.0])
-    );
 
+    // initialize graphics api and generate window handle
+    let handle = unsafe {
+        window_init("Horizon")
+    };
+        
+    // TEMP
     let mesh: [Vertex; 4] = [
         Vertex(Vec3::new([0.0,   0.0,   0.0]), Vec2::new([0.0, 1.0])),
         Vertex(Vec3::new([100.0, 0.0,   0.0]), Vec2::new([1.0, 1.0])),
@@ -70,9 +94,15 @@ fn main() {
     texture.load("./content/textures/tetosphere.png").expect("unable to load texture");
     shader.set_int_uniform("texture0", 0).expect("unable to set uniform");
 
-    app.renderer.add_request(vertex_array, shader, texture);
-
     let camera: Camera = Camera::Orthographic(OrthographicCamera::new(720.0, 640.0));
-    app.attach_camera(camera);
-    app.main_loop();
+    // let camera: Camera = Camera::Perspective(PerspectiveCamera::new(720.0, 640.0));
+
+    let mut render_target = Renderer::new();
+    render_target.add_request(vertex_array, shader, texture);
+
+
+    // start main game loop
+    unsafe {
+        window_event_loop(handle, render_target, &camera);
+    }
 }

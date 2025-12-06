@@ -1,4 +1,3 @@
-use std::clone;
 use std::ops::{Add, Sub, Mul, Div};
 use std::arch::x86_64::{self as simd};
 
@@ -7,7 +6,7 @@ use std::arch::x86_64::{self as simd};
 //////////////////////
 
 #[allow(unused)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum Vector
 {
     Length4(Vec4),
@@ -130,7 +129,7 @@ pub trait Vectorable<T = Self> {
 // VECTOR 4 //
 /////////////
 #[allow(unused)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Vec4 {
     pub data: [f32; 4]
 }
@@ -273,7 +272,7 @@ impl Vectorable for Vec4
 // VECTOR 3 //
 //////////////
 #[allow(unused)]
-#[derive(Debug, clone::Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Vec3 { 
     pub data: [f32; 3 ] 
 }
@@ -423,7 +422,7 @@ impl Vectorable for Vec3
 // VECTOR 2 //
 //////////////
 #[allow(unused)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Vec2 {
     pub data: [f32; 2]
 }

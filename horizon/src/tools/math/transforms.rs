@@ -1,4 +1,4 @@
-use crate::tools::math::matrix::{self, Mat2, Mat3, Mat4, Matrix};
+use crate::tools::math::matrix::{Mat2, Mat3, Mat4, Matrix};
 use crate::tools::math::vector::Vector;
 
 #[allow(unused)]
@@ -133,7 +133,7 @@ pub fn orthographic_matrix(right: f32, left: f32, top: f32, bottom: f32, near: f
 //     Matrix::SquareLength4(Mat4::new([
 //         1.0 / (aspect_ration * (fov / 2.0).tan()), 0.0, 0.0, 0.0,
 //         0.0, 1.0 / (fov / 2.0).tan(), 0.0, 0.0,
-//         0.0, 0.0, -(far + near) / (far - near), -2 * (far * near) / (far - near),
+//         0.0, 0.0, -(far + near) / (far - near), -2.0 * (far * near) / (far - near),
 //         0.0, 0.0, -1.0, 0.0,
 //     ]))
 // }
