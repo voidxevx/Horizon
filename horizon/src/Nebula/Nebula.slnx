@@ -2,6 +2,6 @@
   <Configurations>
     <Platform Name="x64" />
   </Configurations>
-  <Project Path="Neblang/Neblang.vcxproj" />
-  <Project Path="tests/tests.vcxproj" />
+  <Project Path="Neblang/Neblang.vcxproj" Id="fb61eb3e-542b-4289-9029-fdc64e2afe4e" />
+  <Project Path="tests/tests.vcxproj" Id="5b1ca3f2-55f9-4d41-8adc-746a3478fe99" />
 </Solution>

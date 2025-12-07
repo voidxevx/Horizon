@@ -18,5 +18,16 @@
     <ClInclude Include="src\neblang.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\nebula\DataTypes\Data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nebula\DataTypes\types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\nebula\DataTypes\Data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

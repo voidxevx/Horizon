@@ -77,6 +77,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\neblang.h" />
+    <ClInclude Include="src\nebula\DataTypes\Data.h" />
+    <ClInclude Include="src\nebula\DataTypes\types.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\nebula\DataTypes\Data.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
