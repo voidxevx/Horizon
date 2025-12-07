@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="rust_test/rust_test.vcxproj" Id="bd571abd-49bc-4ec7-854c-5ce5dc9f76d7" />
+  <Project Path="scratch/scratch.vcxproj" Id="47363d11-da10-4d69-a50a-7ce9e135f0b5" />
+</Solution>

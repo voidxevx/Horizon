@@ -1,4 +1,14 @@
-use crate::tools::math::{matrix::Matrix, transforms::{orthographic_matrix, perspective_matrix, translation_matrix}, vector::{Vec2, Vec3, Vector}};
+use crate::tools::math::{
+    matrix::Matrix, 
+    transforms::{
+        orthographic_matrix, 
+        perspective_matrix, 
+        translation_matrix
+    }, 
+    vector::{
+        Vec3, Vector
+    }
+};
 
 #[allow(unused)]
 #[derive(Debug, Clone, Copy)]

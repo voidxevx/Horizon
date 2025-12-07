@@ -51,7 +51,6 @@ mod rendering {
 #[repr(C, packed)]
 struct Vertex(Vec3, Vec2);
 
-
 fn main() {
 
     // initialize graphics api and generate window handle

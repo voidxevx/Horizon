@@ -3,10 +3,9 @@ use glutin::ContextWrapper;
 use glutin::PossiblyCurrent;
 use glutin::event::*;
 use glutin::event_loop::*;
-use glutin::platform::unix::x11::ffi::CurrentTime;
 use glutin::window::*;
 
-use std::time::{Instant, Duration};
+use std::time::{Instant};
 
 use crate::rendering::camera::Camera;
 use crate::rendering::renderer::Renderer;
@@ -38,6 +37,7 @@ pub unsafe fn window_init(title: &str) -> WindowHandle {
 
     gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
     gl::Enable(gl::BLEND);
+    gl::Enable(gl::CULL_FACE);
 
     WindowHandle {  
         event_loop: event_loop,
@@ -52,6 +52,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, render_target: Renderer, c
     let mut camera: Camera = camera.clone();
     let mut camera_dx: f32 = 0.0;
     let mut camera_dy: f32 = 0.0;
+    const CAMERA_ACC: f32 = 500.0;
 
     handle.event_loop.run(move |event, _, control_flow| {
         *control_flow = ControlFlow::Poll;
@@ -71,10 +72,8 @@ pub unsafe fn window_event_loop(handle: WindowHandle, render_target: Renderer, c
             _ => ()
         }
 
-        camera_dx *= (0.89);
-        camera_dy *= (0.89);
-
-        println!("{}", camera_dx);
+        camera_dx *= (0.98);
+        camera_dy *= (0.98);
 
         match event {
             Event::LoopDestroyed => (),
@@ -118,7 +117,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, render_target: Renderer, c
                             }, 
                         ..
                     } => {
-                        camera_dy += 50.0;
+                        camera_dy += CAMERA_ACC;
                     },
 
                     /* Down Arrow Event */
@@ -131,7 +130,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, render_target: Renderer, c
                             },
                         .. 
                     } => {
-                        camera_dy -= 50.0;
+                        camera_dy -= CAMERA_ACC;
                     },
 
                     /* Left Arrow Event */
@@ -144,7 +143,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, render_target: Renderer, c
                             }, 
                         ..
                     } => {
-                        camera_dx -= 50.0;
+                        camera_dx -= CAMERA_ACC;
                     },
 
                     /* Right Arrow Event */
@@ -157,7 +156,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, render_target: Renderer, c
                             },
                         .. 
                     } => {
-                        camera_dx += 50.0;
+                        camera_dx += CAMERA_ACC;
                     },
 
                     _ => ()

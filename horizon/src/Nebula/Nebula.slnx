@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="Neblang/Neblang.vcxproj" />
+  <Project Path="tests/tests.vcxproj" />
+</Solution>
