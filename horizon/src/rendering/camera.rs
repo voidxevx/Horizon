@@ -45,10 +45,10 @@ impl OrthographicCamera {
 
     pub fn update_view_matrix(&mut self, width: f32, height: f32) {
         self.view_matrix = orthographic_matrix(
-            0.0,
             width,
             0.0,
             height,
+            0.0,
             0.0,
             1.0
         );
@@ -87,7 +87,6 @@ impl PerspectiveCamera {
                 window_height,
                 0.0,
                 1.0,
-
             ),
             camera_position: Vector::Length3(Vec3::new([0.0, 0.0, 0.0])),
             camera_rotation: Vector::Length3(Vec3::new([0.0, 0.0, 0.0]))
