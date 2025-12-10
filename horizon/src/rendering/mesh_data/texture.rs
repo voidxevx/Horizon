@@ -1,7 +1,32 @@
 use gl::types::*;
 use image::EncodableLayout;
-use std::path::Path;
+use std::{collections::HashMap, path::Path};
 use image::error::ImageError;
+use lazy_static::lazy_static;
+
+lazy_static! {
+    pub static ref SOCKET_MAP: HashMap<u32, u32> = {
+        let mut m: HashMap<u32, u32> = HashMap::new();
+        m.insert(0, gl::TEXTURE0);
+        m.insert(1, gl::TEXTURE1);
+        m.insert(2, gl::TEXTURE2);
+        m.insert(3, gl::TEXTURE3);
+        m.insert(4, gl::TEXTURE4);
+        m.insert(5, gl::TEXTURE5);
+        m.insert(6, gl::TEXTURE6);
+        m.insert(7, gl::TEXTURE7);
+        m.insert(8, gl::TEXTURE8);
+        m.insert(9, gl::TEXTURE9);
+        m.insert(10, gl::TEXTURE10);
+        m.insert(11, gl::TEXTURE11);
+        m.insert(12, gl::TEXTURE12);
+        m.insert(13, gl::TEXTURE13);
+        m.insert(14, gl::TEXTURE14);
+        m.insert(15, gl::TEXTURE15);
+        m.insert(16, gl::TEXTURE16);
+        m
+    };
+}
 
 #[allow(unused)]
 pub struct Texture {

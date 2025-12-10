@@ -32,6 +32,7 @@ pub enum ShaderUniform {
 }
 
 #[allow(unused)]
+#[derive(Debug)]
 pub enum ShaderUniformType {
     None,
     FloatUniform,
@@ -41,6 +42,7 @@ pub enum ShaderUniformType {
 }
 
 #[allow(unused)]
+#[derive(Debug)]
 pub struct ShaderUniformTemplate {
     pub name: String,
     pub val_type: ShaderUniformType,
@@ -153,16 +155,16 @@ impl ShaderProgram {
         }
     }
 
-    pub fn set_uniform(&self, name: &str, value: ShaderUniform) -> Result<(), ShaderError> {
+    pub fn set_uniform(&self, name: &str, value: &ShaderUniform) -> Result<(), ShaderError> {
         unsafe {
             self.apply();
             let uniform: CString = CString::new(name)?;
             let location: i32 = gl::GetUniformLocation(self.id, uniform.as_ptr());
             match value {
                 ShaderUniform::FloatUniform(float, ..) => 
-                    gl::Uniform1f(location, float),
+                    gl::Uniform1f(location, float.clone()),
                 ShaderUniform::IntUniform(int, ..) => 
-                    gl::Uniform1i(location, int),
+                    gl::Uniform1i(location, int.clone()),
                 ShaderUniform::VectorUnform(vec, ..) => match vec {
                     Vector::Length2(vec2) => 
                         gl::Uniform2fv(location, 1, vec2.data.as_ptr()),
@@ -220,6 +222,7 @@ impl ShaderProgram {
                     gl::FLOAT_MAT2 => uniform_type = ShaderUniformType::MatrixUniform(2, 2),
                     gl::FLOAT_MAT3 => uniform_type = ShaderUniformType::MatrixUniform(3, 3),
                     gl::FLOAT_MAT4 => uniform_type = ShaderUniformType::MatrixUniform(4, 4),
+                    gl::SAMPLER_2D => uniform_type = ShaderUniformType::IntUniform,
                     _ => ()
                 }
 

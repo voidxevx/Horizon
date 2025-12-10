@@ -5,8 +5,12 @@ use glutin::event::*;
 use glutin::event_loop::*;
 use glutin::window::*;
 
+use std::sync::Arc;
 use std::time::{Instant};
 
+use crate::rendering::material::Material;
+use crate::rendering::material::MaterialInstance;
+use crate::rendering::material::instance_material;
 use crate::set_attribute;
 use crate::{
     rendering::{
@@ -86,9 +90,16 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
         2, 3, 0,
     ];
 
+    
+
+    let test_material: Arc<Material> = Material::new("./content/materials/default.mat")
+        .expect("Error loading material");
+
+    let test_instance: MaterialInstance = instance_material(test_material);
+
+
 
     let shader = generate_shader("./content/shaders/default.shader").unwrap();
-    println!("{:?}", shader.get_uniforms().len());
 
     let vertex_array = VertexArray::new();
     vertex_array.bind();
@@ -107,7 +118,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
     let texture = Texture::new();
     texture.set_wrapping(gl::REPEAT);
     texture.load("./content/textures/tetosphere.png").expect("unable to load texture");
-    shader.set_uniform("texture0", ShaderUniform::IntUniform(0)).expect("unable to set uniform");
+    shader.set_uniform("texture0", &ShaderUniform::IntUniform(0)).expect("unable to set uniform");
 
 
 

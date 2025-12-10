@@ -800,6 +800,7 @@ dependencies = [
  "gl",
  "glutin",
  "image",
+ "lazy_static",
  "thiserror 2.0.17",
 ]
 

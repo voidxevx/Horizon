@@ -50,11 +50,11 @@ impl Renderer {
                 req.texture.activate(gl::TEXTURE0);
                 req.va.bind();
                 req.shader.apply();
-                req.shader.set_uniform("projectionMatrix", ShaderUniform::MatrixUniform(projection_matrix));
+                req.shader.set_uniform("projectionMatrix", &ShaderUniform::MatrixUniform(projection_matrix));
 
                 match camera {
                     Camera::Orthographic(ortho) => {
-                        req.shader.set_uniform("viewMatrix", ShaderUniform::MatrixUniform(*ortho.get_view_matrix()));
+                        req.shader.set_uniform("viewMatrix", &ShaderUniform::MatrixUniform(*ortho.get_view_matrix()));
                     }
                     _ => ()
                 }
