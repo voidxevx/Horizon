@@ -88,6 +88,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
 
 
     let shader = generate_shader("./content/shaders/default.shader").unwrap();
+    println!("{:?}", shader.get_uniforms().len());
 
     let vertex_array = VertexArray::new();
     vertex_array.bind();
@@ -106,7 +107,9 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
     let texture = Texture::new();
     texture.set_wrapping(gl::REPEAT);
     texture.load("./content/textures/tetosphere.png").expect("unable to load texture");
-    shader.set_int_uniform("texture0", 0).expect("unable to set uniform");
+    shader.set_uniform("texture0", ShaderUniform::IntUniform(0)).expect("unable to set uniform");
+
+
 
 
     let mut render_targets: Vec<RenderTarget> = Vec::new();

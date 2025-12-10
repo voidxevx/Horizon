@@ -1,0 +1,5 @@
+[source]
+./content/shaders/default.shader
+
+[textures]
+./content/textures/tetosphere.png

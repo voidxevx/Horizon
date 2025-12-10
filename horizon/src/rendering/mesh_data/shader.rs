@@ -8,6 +8,7 @@ use gl::types::*;
 use std::path::Path;
 
 use crate::tools::math::matrix::{Matrix};
+use crate::tools::math::vector::{Vector};
 
 #[allow(unused)]
 #[derive(Debug, Error)]
@@ -20,6 +21,29 @@ pub enum ShaderError {
     Utf8Error(#[from] FromUtf8Error),
     #[error("{0}")]
     NulError(#[from] NulError),
+}
+
+#[allow(unused)]
+pub enum ShaderUniform {
+    FloatUniform(f32),
+    IntUniform(i32),
+    VectorUnform(Vector),
+    MatrixUniform(Matrix),
+}
+
+#[allow(unused)]
+pub enum ShaderUniformType {
+    None,
+    FloatUniform,
+    IntUniform,
+    VectorUniform(i32),
+    MatrixUniform(i32, i32),
+}
+
+#[allow(unused)]
+pub struct ShaderUniformTemplate {
+    pub name: String,
+    pub val_type: ShaderUniformType,
 }
 
 #[allow(unused)]
@@ -129,36 +153,84 @@ impl ShaderProgram {
         }
     }
 
-    pub fn set_int_uniform(&self, name: &str, value: i32) -> Result<(), ShaderError> {
+    pub fn set_uniform(&self, name: &str, value: ShaderUniform) -> Result<(), ShaderError> {
         unsafe {
             self.apply();
-            let uniform = CString::new(name)?;
-            gl::Uniform1i(gl::GetUniformLocation(self.id, uniform.as_ptr()), value);
-            Ok(())
+            let uniform: CString = CString::new(name)?;
+            let location: i32 = gl::GetUniformLocation(self.id, uniform.as_ptr());
+            match value {
+                ShaderUniform::FloatUniform(float, ..) => 
+                    gl::Uniform1f(location, float),
+                ShaderUniform::IntUniform(int, ..) => 
+                    gl::Uniform1i(location, int),
+                ShaderUniform::VectorUnform(vec, ..) => match vec {
+                    Vector::Length2(vec2) => 
+                        gl::Uniform2fv(location, 1, vec2.data.as_ptr()),
+                    Vector::Length3(vec3) => 
+                        gl::Uniform3fv(location, 1, vec3.data.as_ptr()),
+                    Vector::Length4(vec4) => 
+                        gl::Uniform4fv(location, 1, vec4.data.as_ptr()),
+                }
+                ShaderUniform::MatrixUniform(mat, ..) => match mat {
+                    Matrix::SquareLength2(mat2) => 
+                        gl::UniformMatrix2fv(location, 1, gl::FALSE, mat2.data.as_ptr()),
+                    Matrix::SquareLength3(mat3) => 
+                        gl::UniformMatrix3fv(location, 1, gl::FALSE, mat3.data.as_ptr()),
+                    Matrix::SquareLength4(mat4) => 
+                        gl::UniformMatrix4fv(location, 1, gl::FALSE, mat4.data.as_ptr()),
+                }
+            }
+
+        Ok(())
         }
     }
 
-    pub fn set_mat_uniform(&self, name: &str, value: Matrix) -> Result<(), ShaderError> {
+    pub fn get_uniforms(&self) -> Vec<ShaderUniformTemplate> {
         unsafe {
-            match value {
-                Matrix::SquareLength2(mat2) => {
-                    Ok(())
-                },
-                Matrix::SquareLength3(mat3) => {
-                    Ok(())
+            let mut uniforms: Vec<ShaderUniformTemplate> = Vec::new();
+
+            let mut count: i32 = 0;
+            gl::GetProgramiv(self.id, gl::ACTIVE_UNIFORMS, &mut count);
+
+            let mut name = vec![0u8; 256];
+            let mut length = 0;
+            let mut size = 0;
+            let mut val_type = 0;
+
+            for i in 0..count {
+                gl::GetActiveUniform(
+                    self.id,
+                    i as u32,
+                    256,
+                    &mut length,
+                    &mut size,
+                    &mut val_type,
+                    name.as_mut_ptr() as *mut i8,
+                );
+
+                let uniform_name = String::from_utf8_lossy(&name[..length as usize]).to_string();
+                let mut uniform_type: ShaderUniformType = ShaderUniformType::None;
+
+                match val_type {
+                    gl::FLOAT => uniform_type = ShaderUniformType::FloatUniform,
+                    gl::INT => uniform_type = ShaderUniformType::IntUniform,
+                    gl::FLOAT_VEC2 => uniform_type = ShaderUniformType::VectorUniform(2),
+                    gl::FLOAT_VEC3 => uniform_type = ShaderUniformType::VectorUniform(3),
+                    gl::FLOAT_VEC4 => uniform_type = ShaderUniformType::VectorUniform(4),
+                    gl::FLOAT_MAT2 => uniform_type = ShaderUniformType::MatrixUniform(2, 2),
+                    gl::FLOAT_MAT3 => uniform_type = ShaderUniformType::MatrixUniform(3, 3),
+                    gl::FLOAT_MAT4 => uniform_type = ShaderUniformType::MatrixUniform(4, 4),
+                    _ => ()
                 }
-                Matrix::SquareLength4(mat4) => {
-                    self.apply();
-                    let uniform: CString = CString::new(name)?;
-                    gl::UniformMatrix4fv(
-                        gl::GetUniformLocation(self.id, uniform.as_ptr()),
-                        1, 
-                        gl::FALSE,
-                        mat4.data.as_ptr()
-                    );
-                    Ok(())
-                }
+
+                uniforms.push(ShaderUniformTemplate { 
+                    name: uniform_name, 
+                    val_type: uniform_type 
+                });
             }
+
+
+            uniforms
         }
     }
 }

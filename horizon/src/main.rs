@@ -11,6 +11,9 @@ use crate::{
 };
 
 mod tools {
+    pub mod debug_widgets{
+        pub mod widget;
+    }
     pub mod math{
         pub mod vector;
         pub mod matrix;
@@ -23,6 +26,7 @@ mod rendering {
     pub mod renderer;
     pub mod camera;
     pub mod render_target;
+    pub mod material;
     pub mod mesh_data {
         pub mod buffer;
         pub mod shader;

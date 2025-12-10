@@ -1,4 +1,4 @@
-use crate::{rendering::{camera::Camera, mesh_data::{shader::ShaderProgram, texture::Texture, vertex_array::VertexArray}}, tools::math::matrix::{Mat4, Matrix}};
+use crate::{rendering::{camera::Camera, mesh_data::{shader::{ShaderProgram, ShaderUniform}, texture::Texture, vertex_array::VertexArray}}, tools::math::matrix::{Mat4, Matrix}};
 use std::ptr;
 
 struct RenderRequest {
@@ -50,11 +50,11 @@ impl Renderer {
                 req.texture.activate(gl::TEXTURE0);
                 req.va.bind();
                 req.shader.apply();
-                req.shader.set_mat_uniform("projectionMatrix", projection_matrix);
+                req.shader.set_uniform("projectionMatrix", ShaderUniform::MatrixUniform(projection_matrix));
 
                 match camera {
                     Camera::Orthographic(ortho) => {
-                        req.shader.set_mat_uniform("viewMatrix", *ortho.get_view_matrix());
+                        req.shader.set_uniform("viewMatrix", ShaderUniform::MatrixUniform(*ortho.get_view_matrix()));
                     }
                     _ => ()
                 }

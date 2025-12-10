@@ -1,4 +1,5 @@
 use crate::tools::math::vector::*;
+use std::ops::Mul;
 
 #[allow(unused)]
 pub trait Matrixable {
@@ -72,6 +73,26 @@ impl Mat4 {
             data: vals
         }
     }
+
+    pub fn from(mat: Matrix) -> Self {
+        match mat {
+            Matrix::SquareLength2(mat2) => 
+                Mat4::new([
+                    mat2.data[0].clone(), mat2.data[1].clone(), 0.0, 0.0,
+                    mat2.data[2].clone(), mat2.data[3].clone(), 0.0, 0.0,
+                    0.0, 0.0, 1.0, 0.0,
+                    0.0, 0.0, 0.0, 1.0,
+                ]),
+            Matrix::SquareLength3(mat3) => 
+                Mat4::new([
+                    mat3.data[0].clone(), mat3.data[1].clone(), mat3.data[2].clone(), 0.0,
+                    mat3.data[3].clone(), mat3.data[4].clone(), mat3.data[5].clone(), 0.0,
+                    0.0, 0.0, 1.0, 0.0,
+                    0.0, 0.0, 0.0, 1.0,
+                ]),
+            Matrix::SquareLength4(mat4) => mat4.clone(),
+        }
+    }
 }
 
 impl Matrixable for Mat4 {
@@ -109,6 +130,13 @@ impl Matrixable for Mat4 {
     }
 }
 
+// impl Mul for Mat4 {
+//     type Output = Self;
+//     fn mul(self, other: Self) -> Output {
+//         // TODO: matrix multilipcation
+//     }
+// }
+
 #[allow(unused)]
 #[derive(Debug, Clone, Copy)]
 pub struct Mat3 {
@@ -120,6 +148,22 @@ impl Mat3 {
     pub fn new (vals: [f32; 9]) -> Self {
         Self {
             data: vals
+        }
+    }
+
+    pub fn from(mat: Matrix) -> Self {
+        match mat {
+            Matrix::SquareLength2(mat2) => Mat3::new([
+                mat2.data[0].clone(), mat2.data[1].clone(), 0.0,
+                mat2.data[2].clone(), mat2.data[3].clone(), 0.0,
+                0.0, 0.0, 1.0,
+            ]),
+            Matrix::SquareLength3(mat3) => mat3.clone(),
+            Matrix::SquareLength4(mat4) => Mat3::new([
+                mat4.data[0].clone(), mat4.data[1].clone(), mat4.data[3].clone(),
+                mat4.data[5].clone(), mat4.data[6].clone(), mat4.data[7].clone(),
+                mat4.data[9].clone(), mat4.data[10].clone(), mat4.data[11].clone(),
+            ])
         }
     }
 }
@@ -169,6 +213,20 @@ impl Mat2 {
     pub fn new(vals: [f32; 4]) -> Self {
         Self {
             data: vals
+        }
+    }
+
+    pub fn from(mat: Matrix) -> Self {
+        match mat {
+            Matrix::SquareLength2(mat2) => mat2.clone(),
+            Matrix::SquareLength3(mat3) => Mat2::new([
+                mat3.data[0].clone(), mat3.data[1].clone(),
+                mat3.data[3].clone(), mat3.data[4].clone(),
+            ]),
+            Matrix::SquareLength4(mat4) => Mat2::new([
+                mat4.data[0].clone(), mat4.data[1].clone(),
+                mat4.data[4].clone(), mat4.data[5].clone(),
+            ])
         }
     }
 }
