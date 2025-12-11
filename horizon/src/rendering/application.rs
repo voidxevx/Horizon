@@ -98,7 +98,6 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
     let test_instance: MaterialInstance = instance_material(test_material);
 
 
-
     let shader = generate_shader("./content/shaders/default.shader").unwrap();
 
     let vertex_array = VertexArray::new();

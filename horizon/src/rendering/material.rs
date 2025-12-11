@@ -105,6 +105,12 @@ impl MaterialInstance {
 
         self.parent_material.bind_textures();
     }
+
+    pub fn set_uniform(&mut self, name: &String, value: ShaderUniform) {
+        let current_uniform = self.uniforms.get_mut(name)
+            .expect("Failed to set uniform value, does not exist");
+        *current_uniform = value;
+    }
 }
 
 #[allow(unused)]
@@ -115,25 +121,20 @@ pub fn instance_material(parent: Arc<Material>) -> MaterialInstance {
     for uniform in uniforms {
         match uniform.val_type {
             ShaderUniformType::FloatUniform => {
-                    created_uniforms.insert(uniform.name.clone(), ShaderUniform::FloatUniform(0.0))
-                        .expect("unable to create uniform");
+                    created_uniforms.insert(uniform.name.clone(), ShaderUniform::FloatUniform(0.0));
                 },
             ShaderUniformType::IntUniform => {
-                    created_uniforms.insert(uniform.name.clone(), ShaderUniform::IntUniform(0))
-                        .expect("unable to create uniform");
+                    created_uniforms.insert(uniform.name.clone(), ShaderUniform::IntUniform(0));
                 },
             ShaderUniformType::VectorUniform(len) => match len {
                 2 => {
-                    created_uniforms.insert(uniform.name.clone(), ShaderUniform::VectorUnform(Vector::Length2(Vec2::new([0.0, 0.0]))))
-                        .expect("unable to create uniform");
+                    created_uniforms.insert(uniform.name.clone(), ShaderUniform::VectorUnform(Vector::Length2(Vec2::new([0.0, 0.0]))));
                 },
                 3 => {
-                    created_uniforms.insert(uniform.name.clone(), ShaderUniform::VectorUnform(Vector::Length3(Vec3::new([0.0, 0.0, 0.0,]))))
-                        .expect("unable to create uniform");
+                    created_uniforms.insert(uniform.name.clone(), ShaderUniform::VectorUnform(Vector::Length3(Vec3::new([0.0, 0.0, 0.0,]))));
                 },
                 4 => {
-                    created_uniforms.insert(uniform.name.clone(), ShaderUniform::VectorUnform(Vector::Length4(Vec4::new([0.0, 0.0, 0.0, 0.0]))))
-                        .expect("unable to create uniform");
+                    created_uniforms.insert(uniform.name.clone(), ShaderUniform::VectorUnform(Vector::Length4(Vec4::new([0.0, 0.0, 0.0, 0.0]))));
                 },
                 _ => ()
             },
@@ -143,16 +144,14 @@ pub fn instance_material(parent: Arc<Material>) -> MaterialInstance {
                         created_uniforms.insert(uniform.name.clone(), ShaderUniform::MatrixUniform(Matrix::SquareLength2(Mat2::new([
                             1.0, 0.0, 
                             0.0, 1.0
-                        ]))))
-                            .expect("unable to create uniform");
+                        ]))));
                     },
                     (3, 3) => {
                         created_uniforms.insert(uniform.name.clone(), ShaderUniform::MatrixUniform(Matrix::SquareLength3(Mat3::new([
                             1.0, 0.0, 0.0, 
                             0.0, 1.0, 0.0, 
                             0.0, 0.0, 1.0
-                        ]))))  
-                            .expect("unable to create uniform");
+                        ]))));
                     },
                     (4, 4) => {
                         created_uniforms.insert(uniform.name.clone(), ShaderUniform::MatrixUniform(Matrix::SquareLength4(Mat4::new([
@@ -160,8 +159,7 @@ pub fn instance_material(parent: Arc<Material>) -> MaterialInstance {
                             0.0, 1.0, 0.0, 0.0, 
                             0.0, 0.0, 1.0, 0.0, 
                             0.0, 0.0, 0.0, 1.0,
-                        ]))))
-                            .expect("unable to create uniform");
+                        ]))));
                     },
                     (_,_) => ()
                 }
