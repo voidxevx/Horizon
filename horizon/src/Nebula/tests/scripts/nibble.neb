@@ -175,7 +175,7 @@ trait interface AttackAble
 		no fallback:
 			drop ComponentName from entityVar;
 		fallback:
-			drop ComponentName from entityVar else {...}
+			try drop ComponentName from entityVar else {...}
 
 */
 entity Player [Avatar]

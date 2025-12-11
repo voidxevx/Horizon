@@ -18,10 +18,11 @@
 */
 
 #include "types.h"
+#include "../systems//function.h"
 
 #include <map>
 #include <string>
-#include <functional>
+#include <optional>
 
 namespace neb::data
 {
@@ -30,18 +31,35 @@ namespace neb::data
 	class IDataType
 	{
 	public:
+		virtual ~IDataType()
+		{
+			for (auto& method : m_Methods)
+				delete method.second;
+		}
+
+		void
+		AddMethod(PropertyID id, function::IFunction* method)
+		{
+			m_Methods[id] = method;
+		}
+
+		inline std::optional<function::IFunction*> GetMethod(PropertyID id) const {
+			if (m_Methods.count(id) > 0)
+				return m_Methods.at(id);
+			else
+				return std::nullopt;
+		}
+
+		virtual IDataInstance* NullDecl() const = 0;
+
+	protected:
 		IDataType(PropertyID id);
-		virtual ~IDataType() = default;
+
 	private:
 		PropertyID m_TypeID;
-		// TODO: map method ID to implementations
+		std::map<PropertyID, function::IFunction*> m_Methods;
 	};
-
-	// this container lets the values in the DataPointer remain constant
-	struct DataPointerConatiner
-	{
-		DataPointer& ptr;
-	};
+	
 
 	struct DataPointer
 	{
@@ -54,13 +72,15 @@ namespace neb::data
 		{}
 	};
 
+	// this container lets the values in the DataPointer remain constant
+	struct DataPointerConatiner
+	{
+		DataPointer& ptr;
+	};
+
 	class IDataInstance
 	{
 	public:
-		IDataInstance(PropertyID id, const IDataType* const& type)
-			: m_TypeID(id)
-			, m_TypeVTable(type)
-		{}
 		virtual ~IDataInstance() = default;
 
 		/* Creates a DataPointer that holds a pointer to the data stored by this instance */
@@ -71,12 +91,17 @@ namespace neb::data
 		virtual void SetFromPointer(const DataPointer&) = 0;
 
 	protected:
+		IDataInstance(PropertyID id, const IDataType* const& type)
+			: m_TypeID(id)
+			, m_TypeVTable(type)
+		{}
 		inline const IDataType* const& GetTypeVTable() const { return m_TypeVTable; }
 
 	private:
 		const PropertyID m_TypeID;
 		const IDataType* const& m_TypeVTable;
 	};
+
 
 	class TypeRegistry
 	{
@@ -86,6 +111,9 @@ namespace neb::data
 
 		/* adds a type to the registry */
 		void RegisterType(PropertyID id, IDataType* ptr);
+
+		/* creates an undefined instance of a specific type */
+		IDataInstance* NullDecl(PropertyID id) const;
 
 		static std::hash<std::string> s_PropertyHasher;
 		static TypeRegistry* Get() { return s_Instance; }

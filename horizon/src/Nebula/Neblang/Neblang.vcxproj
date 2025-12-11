@@ -77,11 +77,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\neblang.h" />
+    <ClInclude Include="src\nebula\components\Archetype.h" />
+    <ClInclude Include="src\nebula\components\Component.h" />
+    <ClInclude Include="src\nebula\components\ComponentPool.h" />
+    <ClInclude Include="src\nebula\components\Interface.h" />
+    <ClInclude Include="src\nebula\components\Trait.h" />
     <ClInclude Include="src\nebula\DataTypes\Data.h" />
     <ClInclude Include="src\nebula\DataTypes\types.h" />
+    <ClInclude Include="src\nebula\DataTypes\VariableScope.h" />
+    <ClInclude Include="src\nebula\systems\function.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\nebula\components\ComponentPool.cpp" />
     <ClCompile Include="src\nebula\DataTypes\Data.cpp" />
+    <ClCompile Include="src\nebula\DataTypes\VariableScope.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

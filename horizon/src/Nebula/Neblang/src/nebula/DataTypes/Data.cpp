@@ -32,4 +32,14 @@ namespace neb::data
 		TypeRegistry::Get()->RegisterType(id, this);
 	}
 
+	IDataInstance*
+	TypeRegistry::NullDecl(PropertyID id)
+	const
+	{
+		if (m_DataTypes.count(id) > 0)
+			return m_DataTypes.at(id)->NullDecl();
+		else
+			return nullptr;
+	}
+
 }

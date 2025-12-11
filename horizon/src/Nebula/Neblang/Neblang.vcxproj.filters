@@ -24,9 +24,36 @@
     <ClInclude Include="src\nebula\DataTypes\types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\nebula\systems\function.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nebula\DataTypes\VariableScope.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nebula\components\Component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nebula\components\ComponentPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nebula\components\Archetype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nebula\components\Interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nebula\components\Trait.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\nebula\DataTypes\Data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\nebula\DataTypes\VariableScope.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\nebula\components\ComponentPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
