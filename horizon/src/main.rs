@@ -27,7 +27,6 @@ mod rendering {
     pub mod camera;
     pub mod render_target;
     pub mod material;
-    pub mod static_mesh;
     pub mod mesh_data {
         pub mod buffer;
         pub mod shader;

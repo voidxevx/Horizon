@@ -63,10 +63,6 @@ pub unsafe fn window_init(title: &str) -> WindowHandle {
     }
 }
 
-#[allow(unused)]
-#[repr(C, packed)]
-struct Vertex(Vec3, Vec2);
-
 
 #[allow(unsafe_op_in_unsafe_fn, unused)]
 pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
@@ -75,11 +71,19 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
     //////////
     // TEMP //
     //////////
-    let mesh: [Vertex; 4] = [
-        Vertex(Vec3::new([0.0,   0.0,   0.0]), Vec2::new([0.0, 1.0])),
-        Vertex(Vec3::new([100.0, 0.0,   0.0]), Vec2::new([1.0, 1.0])),
-        Vertex(Vec3::new([100.0, 100.0, 0.0]), Vec2::new([1.0, 0.0])),
-        Vertex(Vec3::new([0.0,   100.0, 0.0]), Vec2::new([0.0, 0.0])),
+    // let mesh: [Vertex; 4] = [
+    //     Vertex(Vec3::new([0.0,   0.0,   0.0]), Vec2::new([0.0, 1.0])),
+    //     Vertex(Vec3::new([100.0, 0.0,   0.0]), Vec2::new([1.0, 1.0])),
+    //     Vertex(Vec3::new([100.0, 100.0, 0.0]), Vec2::new([1.0, 0.0])),
+    //     Vertex(Vec3::new([0.0,   100.0, 0.0]), Vec2::new([0.0, 0.0])),
+    // ];
+
+    let mesh = [
+        // coords                // texcoords
+        0.0,   0.0,   0.0,       0.0, 1.0,
+        100.0, 0.0,   0.0,       1.0, 1.0,
+        100.0, 100.0, 0.0,       1.0, 0.0,
+        0.0,   100.0, 0.0,       0.0, 0.0,
     ];
 
     let indeces: [i32; 6] = [
@@ -92,7 +96,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
     let test_material: Arc<Material> = Material::new("./content/materials/default.mat")
         .expect("Error loading material");
 
-    let test_instance: MaterialInstance = instance_material(test_material);
+    let test_instance: MaterialInstance = instance_material(test_material.clone());
 
     let vertex_array = VertexArray::new();
     vertex_array.bind();
@@ -100,6 +104,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
     vertex_buffer.buffer_data(&mesh, gl::STATIC_DRAW);
     let index_buffer = Buffer::new(gl::ELEMENT_ARRAY_BUFFER);
     index_buffer.buffer_data(&indeces, gl::STATIC_DRAW);
+    vertex_array.bind_material(test_material.clone());
 
     // let loc_attrib = shader.get_attrib_location("loc").expect("attribute not found");
     // set_attribute!(vertex_array, loc_attrib, Vertex::0);

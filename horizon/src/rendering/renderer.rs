@@ -46,7 +46,9 @@ impl Renderer {
 
             for req in &mut self.render_requests {
                 req.va.bind();
+                println!("Applying material");
                 req.material.apply();
+                println!("Setting uniforms");
                 req.material.set_uniform(&String::from("viewMatrix"), ShaderUniform::MatrixUniform(projection_matrix).clone());
 
                 match camera {
@@ -57,7 +59,9 @@ impl Renderer {
                 }
 
                 // Draw Call
+                println!("Draw call");
                 gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, ptr::null());
+                println!("Draw call successful");
             }
         }
     }

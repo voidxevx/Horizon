@@ -1,4 +1,8 @@
+use std::sync::Arc;
+
 use gl::{types::*};
+
+use crate::rendering::material::Material; 
 
 
 #[allow(unused)]
@@ -42,15 +46,20 @@ impl VertexArray {
         self.bind();
         unsafe {
             gl::VertexAttribPointer(
-                attrib_pos, 
+                attrib_pos,
                 components, 
                 gl::FLOAT, 
                 gl::FALSE, 
-                std::mem::size_of::<V>() as GLint, 
+                std::mem::size_of::<V>() as GLint,
                 offset as *const _,
             );
             gl::EnableVertexAttribArray(attrib_pos);
         }
+    }
+
+    pub fn bind_material(&self, material: Arc<Material>) {
+        self.bind();
+        unsafe { material.bind_layout(); }
     }
 }
 

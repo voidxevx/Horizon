@@ -2,8 +2,8 @@
 330 core
 
 [vertex]
-in vec3 loc;
-in vec2 vertTexCoords;
+layout(location = 0) in vec3 loc;
+layout(location = 1) in vec2 vertTexCoords;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
