@@ -24,6 +24,7 @@ pub enum ShaderError {
 }
 
 #[allow(unused)]
+#[derive(Debug, Clone, Copy)]
 pub enum ShaderUniform {
     FloatUniform(f32),
     IntUniform(i32),
@@ -199,6 +200,7 @@ impl ShaderProgram {
             let mut size = 0;
             let mut val_type = 0;
 
+            
             for i in 0..count {
                 gl::GetActiveUniform(
                     self.id,

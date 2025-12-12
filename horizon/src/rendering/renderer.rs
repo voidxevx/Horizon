@@ -1,10 +1,9 @@
-use crate::{rendering::{camera::Camera, mesh_data::{shader::{ShaderProgram, ShaderUniform}, texture::Texture, vertex_array::VertexArray}}, tools::math::matrix::{Mat4, Matrix}};
+use crate::{rendering::{camera::Camera, material::{MaterialInstance}, mesh_data::{shader::{ShaderUniform}, vertex_array::VertexArray}}, tools::math::matrix::{Mat4, Matrix}};
 use std::ptr;
 
 struct RenderRequest {
     va: VertexArray,
-    shader: ShaderProgram,
-    texture: Texture,
+    material: MaterialInstance,
 }
 
 #[allow(unused)]
@@ -21,15 +20,14 @@ impl Renderer {
         }
     }
 
-    pub fn add_request(&mut self, va: VertexArray, shader: ShaderProgram, texture: Texture) {
+    pub fn add_request(&mut self, va: VertexArray, material: MaterialInstance) {
         self.render_requests.push(RenderRequest { 
             va: va, 
-            shader:  shader,
-            texture: texture,
+            material: material
         });
     }
 
-    pub fn draw_requests(&self, camera: &Camera) {
+    pub fn draw_requests(&mut self, camera: &Camera) {
         unsafe
         {
             let mut projection_matrix: Matrix = Matrix::SquareLength4(Mat4::new([
@@ -46,15 +44,14 @@ impl Renderer {
                 _ => ()
             }
 
-            for req in &self.render_requests {
-                req.texture.activate(gl::TEXTURE0);
+            for req in &mut self.render_requests {
                 req.va.bind();
-                req.shader.apply();
-                req.shader.set_uniform("projectionMatrix", &ShaderUniform::MatrixUniform(projection_matrix));
+                req.material.apply();
+                req.material.set_uniform(&String::from("viewMatrix"), ShaderUniform::MatrixUniform(projection_matrix).clone());
 
                 match camera {
                     Camera::Orthographic(ortho) => {
-                        req.shader.set_uniform("viewMatrix", &ShaderUniform::MatrixUniform(*ortho.get_view_matrix()));
+                        req.material.set_uniform(&String::from("viewMatrix"), ShaderUniform::MatrixUniform(*ortho.get_view_matrix()).clone());
                     }
                     _ => ()
                 }

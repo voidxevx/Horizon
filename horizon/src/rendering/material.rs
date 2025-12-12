@@ -48,6 +48,7 @@ impl Material {
                             MaterialParseTarget::TextureSockets => {
                                 let texture: Texture = Texture::new();
                                     texture.load(&buffer);
+                                    texture.set_wrapping(gl::REPEAT);
                                 texture_sockets.push(TextureSocket { 
                                     index: socket_index, 
                                     texture: texture
@@ -61,9 +62,8 @@ impl Material {
             }
 
             let shader_program: ShaderProgram = generate_shader(shader_path.as_str())?;
-            let shader_uniforms = shader_program.get_uniforms();
 
-            println!("uniforms: {:?}", shader_uniforms);
+            let shader_uniforms = shader_program.get_uniforms();
 
             Ok(Arc::new(Self { 
                 shader_program: shader_program, 
@@ -110,6 +110,10 @@ impl MaterialInstance {
         let current_uniform = self.uniforms.get_mut(name)
             .expect("Failed to set uniform value, does not exist");
         *current_uniform = value;
+    }
+
+    pub fn get_shader_program(&self) -> &ShaderProgram {
+        &self.parent_material.shader_program
     }
 }
 
@@ -168,5 +172,6 @@ pub fn instance_material(parent: Arc<Material>) -> MaterialInstance {
         }
     }
 
+    println!("{:?}", &created_uniforms);
     MaterialInstance { parent_material: parent, uniforms: created_uniforms }
 }

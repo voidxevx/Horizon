@@ -11,14 +11,11 @@ use std::time::{Instant};
 use crate::rendering::material::Material;
 use crate::rendering::material::MaterialInstance;
 use crate::rendering::material::instance_material;
-use crate::set_attribute;
 use crate::{
     rendering::{
         render_target::{RenderTarget},
         mesh_data::{
             buffer::Buffer, 
-            shader::*, 
-            texture::Texture, 
             vertex_array::VertexArray,
         }, 
     },
@@ -97,28 +94,17 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
 
     let test_instance: MaterialInstance = instance_material(test_material);
 
-
-    let shader = generate_shader("./content/shaders/default.shader").unwrap();
-
     let vertex_array = VertexArray::new();
     vertex_array.bind();
-
     let vertex_buffer = Buffer::new(gl::ARRAY_BUFFER);
     vertex_buffer.buffer_data(&mesh, gl::STATIC_DRAW);
-
     let index_buffer = Buffer::new(gl::ELEMENT_ARRAY_BUFFER);
     index_buffer.buffer_data(&indeces, gl::STATIC_DRAW);
 
-    let loc_attrib = shader.get_attrib_location("loc").expect("attribute not found");
-    set_attribute!(vertex_array, loc_attrib, Vertex::0);
-    let tex_attrib = shader.get_attrib_location("vertTexCoords").expect("attribute not found");
-    set_attribute!(vertex_array, tex_attrib, Vertex::1);
-
-    let texture = Texture::new();
-    texture.set_wrapping(gl::REPEAT);
-    texture.load("./content/textures/tetosphere.png").expect("unable to load texture");
-    shader.set_uniform("texture0", &ShaderUniform::IntUniform(0)).expect("unable to set uniform");
-
+    // let loc_attrib = shader.get_attrib_location("loc").expect("attribute not found");
+    // set_attribute!(vertex_array, loc_attrib, Vertex::0);
+    // let tex_attrib = shader.get_attrib_location("vertTexCoords").expect("attribute not found");
+    // set_attribute!(vertex_array, tex_attrib, Vertex::1);
 
 
 
@@ -129,7 +115,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
         );
     }
 
-    render_targets[0].add_draw_request(vertex_array, shader, texture);
+    render_targets[0].add_draw_request(vertex_array, test_instance);
 
     //////////////////////
     // EVENT LOOP START //
@@ -178,7 +164,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
                 unsafe {
                     gl::ClearColor(0.0, 0.0, 0.0, 1.0,);
                     gl::Clear(gl::COLOR_BUFFER_BIT);
-                    for render_target in &render_targets {
+                    for render_target in &mut render_targets {
                         render_target.capture();
                     }
                     handle.context.swap_buffers().unwrap();

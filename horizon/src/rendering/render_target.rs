@@ -1,4 +1,4 @@
-use crate::rendering::{camera::{Camera, OrthographicCamera, PerspectiveCamera}, mesh_data::{shader::ShaderProgram, texture::Texture, vertex_array::VertexArray}, renderer::Renderer};
+use crate::rendering::{camera::{Camera, OrthographicCamera, PerspectiveCamera}, material::{MaterialInstance}, mesh_data::{vertex_array::VertexArray}, renderer::Renderer};
 
 pub const RENDER_TARGET_ORTHOGRAPHIC: i32 = 0b1 as i32;
 pub const RENDER_TARGET_PERSPECTIVE: i32 = 0b10 as i32;
@@ -44,12 +44,12 @@ impl RenderTarget {
         }
     }
 
-    pub fn capture(&self) {
+    pub fn capture(&mut self) {
         self.renderer.draw_requests(&self.camera);
     }
 
-    pub fn add_draw_request(&mut self, va: VertexArray, shader: ShaderProgram, texture: Texture) {
-        self.renderer.add_request(va, shader, texture);
+    pub fn add_draw_request(&mut self, va: VertexArray, material: MaterialInstance) {
+        self.renderer.add_request(va, material);
     }
 
 }
