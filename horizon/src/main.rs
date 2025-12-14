@@ -51,6 +51,11 @@ mod rendering {
 #[repr(C, packed)]
 struct Vertex(Vec3, Vec2);
 
+unsafe extern "C"
+{
+    unsafe fn neb_init();
+}
+
 fn main() {
 
     // initialize graphics api and generate window handle
@@ -102,6 +107,7 @@ fn main() {
 
     // start main game loop
     unsafe {
+        neb_init();
         window_event_loop(handle, render_target, &camera);
     }
 }

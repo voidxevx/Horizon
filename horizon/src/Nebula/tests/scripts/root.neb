@@ -1,0 +1,7 @@
+module root
+use ./tests/scripts/nibble.neb
+
+global root(): void
+{
+	
+}

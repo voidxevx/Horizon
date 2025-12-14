@@ -19,21 +19,21 @@ namespace neb::data
 	}
 
 	void
-	TypeRegistry::RegisterType(PropertyID id, IDataType* ptr)
+	TypeRegistry::RegisterType(type::PropertyID id, IDataType* ptr)
 	{
 		if (m_DataTypes.count(id) > 0)
 			m_DataTypes[id];
 		m_DataTypes[id] = ptr;
 	}
 
-	IDataType::IDataType(PropertyID id)
+	IDataType::IDataType(type::PropertyID id)
 		: m_TypeID(id)
 	{
 		TypeRegistry::Get()->RegisterType(id, this);
 	}
 
 	IDataInstance*
-	TypeRegistry::NullDecl(PropertyID id)
+	TypeRegistry::NullDecl(type::PropertyID id)
 	const
 	{
 		if (m_DataTypes.count(id) > 0)

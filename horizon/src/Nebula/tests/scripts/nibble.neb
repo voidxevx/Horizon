@@ -117,8 +117,8 @@ arch Enemy [DamageComponent, TransformComponent, SpriteComponent]
 */
 interface DamageAble
 {
-	function takeDamage(amount: i32): bool
 	requires [DamageComponent]
+	function takeDamage(amount: i32): bool
 	{
 		return DamageComponent_takeDamage(amout);
 	}

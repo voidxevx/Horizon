@@ -1,0 +1,6 @@
+﻿  ComponentPool.cpp
+C:\Users\Owner\projects\horizon\horizon\src\Nebula\Neblang\src\nebula\components\ComponentPool.cpp(11,28): warning C4114: same type qualifier used more than once
+  Data.cpp
+  VariableScope.cpp
+  state.cpp
+  Neblang.vcxproj -> C:\Users\Owner\projects\horizon\horizon\src\Nebula\x64\Release\Neblang.lib

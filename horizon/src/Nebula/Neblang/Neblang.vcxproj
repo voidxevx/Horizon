@@ -25,7 +25,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -44,6 +44,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)bin\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)bin-int\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)bin\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
@@ -82,15 +86,19 @@
     <ClInclude Include="src\nebula\components\ComponentPool.h" />
     <ClInclude Include="src\nebula\components\Interface.h" />
     <ClInclude Include="src\nebula\components\Trait.h" />
+    <ClInclude Include="src\nebula\components\TraitInterface.h" />
     <ClInclude Include="src\nebula\DataTypes\Data.h" />
     <ClInclude Include="src\nebula\DataTypes\types.h" />
     <ClInclude Include="src\nebula\DataTypes\VariableScope.h" />
+    <ClInclude Include="src\nebula\Entity\Entity.h" />
+    <ClInclude Include="src\nebula\state.h" />
     <ClInclude Include="src\nebula\systems\function.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\nebula\components\ComponentPool.cpp" />
     <ClCompile Include="src\nebula\DataTypes\Data.cpp" />
     <ClCompile Include="src\nebula\DataTypes\VariableScope.cpp" />
+    <ClCompile Include="src\nebula\state.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

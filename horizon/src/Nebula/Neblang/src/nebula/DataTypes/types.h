@@ -1,6 +1,6 @@
 #pragma once
 
-namespace neb
+namespace neb::type
 {
 
 	typedef size_t PropertyID;

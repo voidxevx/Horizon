@@ -16,5 +16,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="scripts\nibble.neb" />
+    <None Include="scripts\root.neb" />
   </ItemGroup>
 </Project>

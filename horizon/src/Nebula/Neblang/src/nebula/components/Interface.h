@@ -7,15 +7,15 @@
 #include <map>
 #include <optional>
 
-namespace neb::component
+namespace neb
 {
 
 	struct InterfaceFunction
 	{
-		std::set<PropertyID> RequiredComponents;
+		std::set<type::PropertyID> RequiredComponents;
 		function::IFunction* Function;
 
-		InterfaceFunction(std::set<PropertyID> requirements, function::IFunction* function)
+		InterfaceFunction(std::set<type::PropertyID> requirements, function::IFunction* function)
 			: RequiredComponents(requirements)
 			, Function(function)
 		{}
@@ -33,13 +33,13 @@ namespace neb::component
 		InterfaceVtable() = default;
 
 		void
-		AddFunction(PropertyID id, function::IFunction* method, std::set<PropertyID> requirements)
+		AddFunction(type::PropertyID id, function::IFunction* method, std::set<type::PropertyID> requirements)
 		{
 			m_Functions[id] = InterfaceFunction{ requirements, method };
 		}
 
 		inline std::optional<InterfaceFunction>
-		GetFunction(const PropertyID& id)
+		GetFunction(const type::PropertyID& id)
 		{
 			if (m_Functions.count(id) > 0)
 				return m_Functions.at(id);
@@ -48,7 +48,7 @@ namespace neb::component
 		}
 
 	private:
-		std::map<PropertyID, InterfaceFunction> m_Functions;
+		std::map<type::PropertyID, InterfaceFunction> m_Functions;
 	};
 
 }

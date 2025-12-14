@@ -25,7 +25,7 @@ namespace neb::data
 	}
 
 	void 
-	DataScope::PushVariable(PropertyID id, IDataInstance* data)
+	DataScope::PushVariable(type::PropertyID id, IDataInstance* data)
 	{
 		if (m_ScopeVariables.count(id) == 0)
 			m_ScopeVariables[id] = data;
@@ -34,7 +34,7 @@ namespace neb::data
 	}
 
 	std::optional<const DataPointer>
-	DataScope::GetVariable(PropertyID id)
+	DataScope::GetVariable(type::PropertyID id)
 	const
 	{
 		if (m_ScopeVariables.count(id) > 0)
@@ -46,7 +46,7 @@ namespace neb::data
 	}
 
 	void
-	DataScope::SetVariable(PropertyID id, const DataPointer& data)
+	DataScope::SetVariable(type::PropertyID id, const DataPointer& data)
 	{
 		if (m_ScopeVariables.count(id) > 0)
 			m_ScopeVariables[id]->SetFromPointer(data);

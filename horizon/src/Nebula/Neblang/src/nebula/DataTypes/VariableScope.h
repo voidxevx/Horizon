@@ -21,15 +21,15 @@ namespace neb::data
 
 		void AddGarbageData(IDataInstance* data);
 		/* - attempting to instantiate a variable with an id that already exists will push the data into garbage collection */
-		void PushVariable(PropertyID id, IDataInstance* data);
+		void PushVariable(type::PropertyID id, IDataInstance* data);
 		
-		std::optional<const DataPointer> GetVariable(PropertyID id) const;
+		std::optional<const DataPointer> GetVariable(type::PropertyID id) const;
 		/* - The passed DataPointer must match the type of the variable */
-		void SetVariable(PropertyID id, const DataPointer& data);
+		void SetVariable(type::PropertyID id, const DataPointer& data);
 
 	private:
 		std::vector<IDataInstance*> m_GarbageData; // garbage data is data created during computations that needs be deallocated at some point.
-		std::map<PropertyID, IDataInstance*> m_ScopeVariables;
+		std::map<type::PropertyID, IDataInstance*> m_ScopeVariables;
 		std::optional<DataScope*> m_LowerScope = std::nullopt;
 	};
 
@@ -68,7 +68,7 @@ namespace neb::data
 		}
 
 		inline void 
-		PushVariable(PropertyID id, IDataInstance* data)
+		PushVariable(type::PropertyID id, IDataInstance* data)
 		const
 		{
 			CurrentScope->PushVariable(id, data);

@@ -1,19 +1,18 @@
 #pragma once
 
-#include "../DataTypes/types.h"
 #include "../systems/function.h"
 
 #include <vector>
 #include <map>
 #include <optional>
 
-namespace neb::component
+namespace neb
 {
 
 	class ComponentVTable
 	{
 	public:
-		ComponentVTable(std::vector<std::pair<PropertyID, PropertyID>> properties)
+		ComponentVTable(std::vector<std::pair<type::PropertyID, type::PropertyID>> properties)
 		{
 			for (const auto& prop : properties)
 			{
@@ -29,13 +28,13 @@ namespace neb::component
 		}
 
 		void
-		AddMethod(PropertyID id, function::IFunction* method)
+		AddMethod(type::PropertyID id, function::IFunction* method)
 		{
 			m_Methods[id] = method;
 		}
 
 		inline std::optional<function::IFunction*> 
-		GetMethod(const PropertyID& id)
+		GetMethod(const type::PropertyID& id)
 		const 
 		{
 			if (m_Methods.count(id) > 0)
@@ -45,16 +44,16 @@ namespace neb::component
 		}
 
 		inline const size_t GetAllocationSize() const { return m_ComponentProperties.size(); }
-		inline const std::vector<PropertyID>& GetProperties() const { return m_ComponentProperties; }
-		const bool HasProperty(const PropertyID& prop) const { return m_PropertyLocations.count(prop) > 0; }
+		inline const std::vector <type::PropertyID > & GetProperties() const { return m_ComponentProperties; }
+		const bool HasProperty(const type::PropertyID& prop) const { return m_PropertyLocations.count(prop) > 0; }
 
-		const size_t GetPropertyLocation(const PropertyID& id) const { return m_PropertyLocations.at(id); }
+		const size_t GetPropertyLocation(const type::PropertyID& id) const { return m_PropertyLocations.at(id); }
 
 	private:
-		std::vector<PropertyID> m_ComponentProperties; // list of property types in the order that they are emplaced.
-		std::map<PropertyID, size_t> m_PropertyLocations; // maps property ids to their location within the property list. this will be used to find where the property is located in virtual memory.
+		std::vector<type::PropertyID> m_ComponentProperties; // list of property types in the order that they are emplaced.
+		std::map<type::PropertyID, size_t> m_PropertyLocations; // maps property ids to their location within the property list. this will be used to find where the property is located in virtual memory.
 
-		std::map<PropertyID, function::IFunction*> m_Methods;
+		std::map<type::PropertyID, function::IFunction*> m_Methods;
 	};
 
 }

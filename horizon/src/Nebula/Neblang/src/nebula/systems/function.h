@@ -11,8 +11,8 @@ namespace neb::function
 
 	struct FunctionTemplate
 	{
-		std::vector<PropertyID> InputTypes;
-		PropertyID OutputType;
+		std::vector<type::PropertyID> InputTypes;
+		type::PropertyID OutputType;
 	};
 
 	class IFunction
@@ -20,21 +20,21 @@ namespace neb::function
 	public:
 		virtual ~IFunction() = default;
 
-		inline const PropertyID GetID() const { return m_FunctionID; }
+		inline const type::PropertyID GetID() const { return m_FunctionID; }
 
 	protected:
-		IFunction(PropertyID id)
+		IFunction(type::PropertyID id)
 			: m_FunctionID(id)
 		{}
 
 	private:
-		PropertyID m_FunctionID;
+		type::PropertyID m_FunctionID;
 	};
 
 	class NativeFunction : public IFunction
 	{
 	public:
-		NativeFunction(PropertyID id)
+		NativeFunction(type::PropertyID id)
 			:IFunction(id)
 		{}
 		virtual ~NativeFunction() = default;

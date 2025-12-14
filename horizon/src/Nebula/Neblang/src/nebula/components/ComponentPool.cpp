@@ -1,17 +1,16 @@
 #include "ComponentPool.h"
+#include "../DataTypes/types.h"
 
-namespace neb::component
+namespace neb
 {
-	ComponentMemoryAllocator::ComponentMemoryAllocator(ComponentPool& owningPool, PropertyID& owningEntity)
+
+	ComponentMemoryAllocator::ComponentMemoryAllocator(type::PropertyID& owningEntity, const size_t allocationSize, const std::vector<type::PropertyID>& properties)
 		: OwningEntity(owningEntity)
-		, OwningPool(owningPool)
 	{
-		const ComponentVTable& vtable = OwningPool.GetVTable();
-		size_t allocationSize = vtable.GetAllocationSize();
 		Data = (data::IDataInstance**)malloc(allocationSize * sizeof(data::IDataInstance*));
 		const data::TypeRegistry const* reg = data::TypeRegistry::Get();
 		size_t i{};
-		for (const auto& prop : vtable.GetProperties())
+		for (const auto& prop : properties)
 		{
 			Data[i] = reg->NullDecl(prop);
 			++i;
@@ -20,8 +19,7 @@ namespace neb::component
 
 	ComponentMemoryAllocator::~ComponentMemoryAllocator()
 	{
-		size_t allocationSize = OwningPool.GetVTable().GetAllocationSize();
-		for (size_t i{}; i < allocationSize; ++i)
+		for (size_t i{}; i < AllocationSize; ++i)
 		{
 			delete Data[i];
 			Data[i] = nullptr;
@@ -48,12 +46,12 @@ namespace neb::component
 	{}
 
 	const bool 
-	ComponentPool::CreateComponent(PropertyID& owningEntity)
+	ComponentPool::CreateComponent(type::PropertyID& owningEntity)
 	{
 		if (m_ComponentOwnerships.count(owningEntity) == 0)
 		{
 			m_ComponentOwnerships[owningEntity] = m_Pool.size();
-			m_Pool.push_back(ComponentMemoryAllocator(*this, owningEntity));
+			m_Pool.push_back(ComponentMemoryAllocator{ owningEntity, m_Component.GetAllocationSize(), m_Component.GetProperties() });
 			return true;
 		}
 		else
@@ -61,7 +59,7 @@ namespace neb::component
 	}
 
 	const bool
-	ComponentPool::DestroyComponent(const PropertyID& owningEntity)
+	ComponentPool::DestroyComponent(const type::PropertyID& owningEntity)
 	{
 		if (m_ComponentOwnerships.count(owningEntity) > 0)
 		{
@@ -72,7 +70,7 @@ namespace neb::component
 
 			// get top component
 			ComponentMemoryAllocator& topAllocator = m_Pool.back();
-			const PropertyID& topEntity = topAllocator.OwningEntity;
+			const type::PropertyID& topEntity = topAllocator.OwningEntity;
 
 			// get the removed data
 			const size_t trashEntityLocation = m_ComponentOwnerships.at(owningEntity);
@@ -96,7 +94,7 @@ namespace neb::component
 
 
 	std::optional<const data::DataPointer>
-	ComponentPool::GetComponentProperty(const PropertyID& owningEntity, const PropertyID& property)
+	ComponentPool::GetComponentProperty(const type::PropertyID& owningEntity, const type::PropertyID& property)
 	const
 	{
 		if (m_ComponentOwnerships.count(owningEntity) > 0 && m_Component.HasProperty(property))
@@ -109,7 +107,7 @@ namespace neb::component
 	}
 
 	const bool
-	ComponentPool::SetComponentProperty(const PropertyID& owningEntity, const PropertyID& property, const data::DataPointer& value)
+	ComponentPool::SetComponentProperty(const type::PropertyID& owningEntity, const type::PropertyID& property, const data::DataPointer& value)
 	{
 		if (m_ComponentOwnerships.count(owningEntity) > 0 && m_Component.HasProperty(property))
 		{

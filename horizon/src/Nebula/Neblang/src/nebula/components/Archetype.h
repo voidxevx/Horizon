@@ -7,7 +7,7 @@
 #include <optional>
 #include <set>
 
-namespace neb::component
+namespace neb
 {
 
 	class ArchetypeVTable
