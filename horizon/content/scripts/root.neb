@@ -1,0 +1,8 @@
+module root
+#use
+    test
+#end
+
+global root(): void {
+    
+}

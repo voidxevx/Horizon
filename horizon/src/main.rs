@@ -15,9 +15,11 @@ use crate::{
         renderer::Renderer
     },
 
-    tools::math::vector::{
-        Vec2, 
-        Vec3
+    tools::{
+        math::vector::{
+            Vec2, 
+            Vec3
+        }, nebula::neb
     }
 };
 
@@ -32,6 +34,9 @@ mod tools {
         pub mod vector;
         pub mod matrix;
         pub mod transforms;
+    }
+    pub mod nebula{
+        pub mod neb;
     }
 }
 
@@ -51,10 +56,6 @@ mod rendering {
 #[repr(C, packed)]
 struct Vertex(Vec3, Vec2);
 
-unsafe extern "C"
-{
-    unsafe fn neb_init();
-}
 
 fn main() {
 
@@ -107,7 +108,8 @@ fn main() {
 
     // start main game loop
     unsafe {
-        neb_init();
+        neb::neb_init();
+        neb::link_file("./content/scripts/test.neb");
         window_event_loop(handle, render_target, &camera);
     }
 }

@@ -97,6 +97,7 @@
   <ItemGroup>
     <ClCompile Include="src\nebula\components\ComponentPool.cpp" />
     <ClCompile Include="src\nebula\DataTypes\Data.cpp" />
+    <ClCompile Include="src\nebula\DataTypes\types.cpp" />
     <ClCompile Include="src\nebula\DataTypes\VariableScope.cpp" />
     <ClCompile Include="src\nebula\state.cpp" />
   </ItemGroup>
