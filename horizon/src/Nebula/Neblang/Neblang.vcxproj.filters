@@ -54,6 +54,9 @@
     <ClInclude Include="src\nebula\state.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\nebula\Debug\ErrorHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\nebula\DataTypes\Data.cpp">

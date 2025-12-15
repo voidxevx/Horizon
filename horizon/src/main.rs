@@ -19,11 +19,16 @@ use crate::{
         math::vector::{
             Vec2, 
             Vec3
-        }, nebula::neb
+        }, 
+        nebula::{
+            debug::{
+                self, NEB_ERROR_INFO, enable_debug_mode, print_error, set_error_pipe
+            }, 
+            neb
+        }
     }
 };
 
-#[allow(unused)]
 use crate::{
     rendering::application::*,
     rendering::mesh_data::{buffer},
@@ -37,6 +42,7 @@ mod tools {
     }
     pub mod nebula{
         pub mod neb;
+        pub mod debug;
     }
 }
 
@@ -52,7 +58,8 @@ mod rendering {
     }
 }
 
-#[allow(unused)]
+use std::ffi::CString;
+
 #[repr(C, packed)]
 struct Vertex(Vec3, Vec2);
 
@@ -108,8 +115,13 @@ fn main() {
 
     // start main game loop
     unsafe {
+        enable_debug_mode();
         neb::neb_init();
+
+        set_error_pipe_message!("Failed to link module");
         neb::link_file("./content/scripts/test.neb");
+
+        set_error_pipe_message!("Runtime error");
         window_event_loop(handle, render_target, &camera);
     }
 }

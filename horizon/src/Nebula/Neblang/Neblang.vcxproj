@@ -90,6 +90,7 @@
     <ClInclude Include="src\nebula\DataTypes\Data.h" />
     <ClInclude Include="src\nebula\DataTypes\types.h" />
     <ClInclude Include="src\nebula\DataTypes\VariableScope.h" />
+    <ClInclude Include="src\nebula\Debug\ErrorHandler.h" />
     <ClInclude Include="src\nebula\Entity\Entity.h" />
     <ClInclude Include="src\nebula\state.h" />
     <ClInclude Include="src\nebula\systems\function.h" />

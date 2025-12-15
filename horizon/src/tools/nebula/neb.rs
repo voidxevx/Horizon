@@ -3,9 +3,10 @@ use std::io::{BufRead, BufReader};
 use std::fs::File;
 use std::os::raw::c_char;
 use std::ffi::CString;
+use crate::tools::nebula::debug::{print_error, NEB_ERROR_WARNING};
+use crate::neberror;
 
 // neblang linakge
-#[allow(unused)]
 unsafe extern "C"
 {
     pub unsafe fn neb_init();
@@ -36,12 +37,12 @@ pub unsafe fn link_file(file_path_str: &str) {
                         }
                     }
                 }
-                eprintln!("\x1b[33m[RS][Neblang] WARNING - Failed to link module, syntax error for module header. Expects pattern \"module <name>\"\x1b[0m");
+                neberror!(NEB_ERROR_WARNING, "syntax error for module header. Expected pattern \"module <name>\"");
             },
-            None => eprintln!("\x1b[33m[RS][Neblang] WARNING - Failed to link module, failed to read module header")
+            None => { neberror!(NEB_ERROR_WARNING, "failed to read module header"); }
         }
     }
     else {
-        eprintln!("\x1b[33m[RS][Neblang] WARNING - Failed to link module, linked file path does not exist or is not a file.\x1b[0m")
+        neberror!(NEB_ERROR_WARNING, "Linked file path does not exist or is not a file");
     }
 }

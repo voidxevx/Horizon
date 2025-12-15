@@ -1,7 +1,6 @@
 #include "state.h"
 
-#include <assert.h>
-#include <iostream>
+#include "Debug/ErrorHandler.h"
 
 namespace neb
 {
@@ -26,7 +25,7 @@ namespace neb
 			m_Modules[id] = filePath;
 		}
 		else
-			std::cout << "\033[33m[CPP][Neblang] WARNING - Failed to link module, Module under the same alias was already linked.\033[0m\n";
+			neberror_debug(NEB_ERROR_WARNING, "Module under the same alias was already linked");
 	}
 
 	extern "C"
@@ -40,7 +39,7 @@ namespace neb
 		void
 		neb_link_module(const char* name, const char* path)
 		{
-			assert(State::Get() && "\033[31m[CPP][Nebalang] CRITICAL - Failed to link module, State is not initialized or was destroyed.\033[0m");
+			neberror_assertion(!State::Get(), NEB_ERROR_CRITICAL, "State is not initialized or was destroyed.");
 			State::Get()->LinkModule(name, path);
 		}
 	}
