@@ -11,19 +11,20 @@ use std::time::{Instant};
 use crate::rendering::material::Material;
 use crate::rendering::material::MaterialInstance;
 use crate::rendering::material::instance_material;
-use crate::rendering::mesh_data::shader_data_type::ShaderDataType;
+use crate::set_attribute;
+use crate::tools::math::vector::{Vec3, Vec2};
 use crate::{
     rendering::{
         render_target::{RenderTarget},
         mesh_data::{
             buffer::Buffer, 
             vertex_array::VertexArray,
-            vertex_layout::VertexLayout,
         }, 
     },
 };
 
-
+#[repr(C, packed)]
+struct Vertex (Vec3, Vec2);
 
 pub struct  WindowHandle {
     pub event_loop: EventLoop<()>,
@@ -65,18 +66,14 @@ pub unsafe fn window_init(title: &str) -> WindowHandle {
 pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
     let mut last_frame_time = Instant::now();
 
-    let layout: VertexLayout = VertexLayout::new(vec![
-        ShaderDataType::Float3,
-        ShaderDataType::Float2,
-    ]);
-
     let mesh = [
         // coords              // texcoords
-        0.0,   0.0,   0.0,       0.0, 1.0,
-        100.0, 0.0,   0.0,       1.0, 1.0,
-        100.0, 100.0, 0.0,       1.0, 0.0,
-        0.0,   100.0, 0.0,       0.0, 0.0,
+        Vertex( Vec3::new([0.0,   0.0,   0.0]), Vec2::new([0.0, 1.0]) ),
+        Vertex( Vec3::new([100.0, 0.0,   0.0]), Vec2::new([1.0, 1.0]) ),
+        Vertex( Vec3::new([100.0, 100.0, 0.0]), Vec2::new([1.0, 0.0]) ),
+        Vertex( Vec3::new([0.0,   100.0, 0.0]), Vec2::new([0.0, 0.0]) ),
     ];
+
 
     let indeces: [i32; 6] = [
         0, 1, 2,
@@ -92,17 +89,18 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
 
     let vertex_array = VertexArray::new();
     vertex_array.bind();
-    layout.bind();
     let vertex_buffer = Buffer::new(gl::ARRAY_BUFFER);
     vertex_buffer.buffer_data(&mesh, gl::STATIC_DRAW);
     let index_buffer = Buffer::new(gl::ELEMENT_ARRAY_BUFFER);
     index_buffer.buffer_data(&indeces, gl::STATIC_DRAW);
     vertex_array.bind_material(test_material.clone());
 
-    // let loc_attrib = shader.get_attrib_location("loc").expect("attribute not found");
-    // set_attribute!(vertex_array, loc_attrib, Vertex::0);
-    // let tex_attrib = shader.get_attrib_location("vertTexCoords").expect("attribute not found");
-    // set_attribute!(vertex_array, tex_attrib, Vertex::1);
+    let shader = &test_material.shader_program;
+
+    let loc_attrib = shader.get_attrib_location("loc").expect("attribute not found");
+    set_attribute!(vertex_array, loc_attrib, Vertex::0);
+    let tex_attrib = shader.get_attrib_location("vertTexCoords").expect("attribute not found");
+    set_attribute!(vertex_array, tex_attrib, Vertex::1);
 
 
 
