@@ -8,28 +8,10 @@ pub struct TextureSocket {
 }
 
 #[allow(unused)]
-#[derive(Debug)]
-pub struct ShaderLayoutAttrib {
-    position: u32,
-    item_count: u32,
-    item_type: u32,
-    normalized: u8,
-    offset: u32,
-}
-
-#[allow(unused)]
-#[derive(Debug)]
-pub struct ShaderLayout {
-    layout_data: Vec<ShaderLayoutAttrib>,
-    stride: u32,
-}
-
-#[allow(unused)]
 pub struct Material {
     pub shader_program: ShaderProgram,
     uniforms: Vec<ShaderUniformTemplate>,
     textures: Vec<TextureSocket>,
-    layout: ShaderLayout,
 }
 
 #[allow(unused)]
@@ -82,13 +64,11 @@ impl Material {
             let shader_program: ShaderProgram = generate_shader(shader_path.as_str())?;
 
             let shader_uniforms = shader_program.get_uniforms();
-            let layout = unsafe { Self::get_layout(&shader_program.id) };
 
             Ok(Arc::new(Self { 
                 shader_program: shader_program, 
                 uniforms: shader_uniforms,
                 textures: texture_sockets,
-                layout: layout,
             }))
         }
         else{
@@ -97,113 +77,6 @@ impl Material {
 
     }
 
-
-    #[allow(unsafe_op_in_unsafe_fn)]
-    unsafe fn get_layout(shader_id: &u32) -> ShaderLayout {
-        let mut layout: ShaderLayout = ShaderLayout { 
-            layout_data: Vec::new(),
-            stride: 0
-        };
-
-        let mut count = 0;
-        let mut buffer_size = 0;
-        gl::GetProgramiv(*shader_id, gl::ACTIVE_ATTRIBUTES, &mut count);
-        gl::GetProgramiv(*shader_id, gl::ACTIVE_ATTRIBUTE_MAX_LENGTH, &mut buffer_size);
-
-        let mut name = vec![0u8; buffer_size as usize];
-        let mut name_length = 0;
-        let mut attrib_size = 0;
-        let mut attrib_type = 0;
-
-        let mut current_offset = 0;
-
-        for i in 0..count {
-            gl::GetActiveAttrib(
-                *shader_id, 
-                i as u32, 
-                buffer_size, 
-                &mut name_length, 
-                &mut attrib_size,
-                &mut attrib_type,
-                name.as_mut_ptr() as *mut i8
-            );
-
-
-            let mut attrib_item_count: u32 = 0;
-            let mut attrib_offset_size: u32 = 0;
-            
-            match attrib_type {
-                gl::FLOAT_VEC2 => {
-                    attrib_item_count = 2;
-                    attrib_offset_size = 2 * size_of::<f32>() as u32;
-                },
-                gl::FLOAT_VEC3 => {
-                    attrib_item_count = 3;
-                    attrib_offset_size = 3 * size_of::<f32>() as u32;
-                },
-                gl::FLOAT_VEC4 => {
-                    attrib_item_count = 4;
-                    attrib_offset_size = 4 * size_of::<f32>() as u32;
-                },
-                gl::FLOAT_MAT2 => {
-                    attrib_item_count = 4;
-                    attrib_offset_size = 4 * size_of::<f32>() as u32;
-                },
-                gl::FLOAT_MAT3 => {
-                    attrib_item_count = 9;
-                    attrib_offset_size = 9 * size_of::<f32>() as u32;
-                },
-                gl::FLOAT_MAT4 => {
-                    attrib_item_count = 16;
-                    attrib_offset_size = 16 * size_of::<f32>() as u32;
-                },
-                gl::INT => {
-                    attrib_item_count = 1;
-                    attrib_offset_size = 16 * size_of::<i32>() as u32;
-                }
-                // ... as more data implemented.
-                _ => (),
-            };
-
-
-            let layout_attrib: ShaderLayoutAttrib = ShaderLayoutAttrib { 
-                position: i as u32,
-                item_count: attrib_item_count,
-                item_type: attrib_type,
-                normalized: gl::FALSE, 
-                offset: current_offset,
-            };
-
-            current_offset += attrib_offset_size;
-
-            layout.layout_data.push(layout_attrib);
-        }
-
-        layout.stride = current_offset;
-        println!("{:?}", layout);
-
-        layout
-    }
-
-    #[allow(unsafe_op_in_unsafe_fn)]
-    pub unsafe fn bind_layout(&self) {
-        let layout = &self.layout;
-
-        for attrib in &layout.layout_data {
-            println!("binding attrib pointer");
-            gl::VertexAttribPointer(
-                attrib.position,
-                attrib.item_count as i32,
-                attrib.item_type,
-                attrib.normalized,
-                layout.stride as i32,
-                attrib.offset as *const _,
-            );
-            println!("enabling attribute");
-            gl::EnableVertexAttribArray(attrib.position);
-            println!("bind successful");
-        }
-    }
 
     pub fn get_uniforms(&self) -> &Vec<ShaderUniformTemplate> {
         &self.uniforms

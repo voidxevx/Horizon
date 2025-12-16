@@ -32,6 +32,8 @@ mod rendering {
         pub mod shader;
         pub mod vertex_array;
         pub mod texture;
+        pub mod shader_data_type;
+        pub mod vertex_layout;
     }
 }
 

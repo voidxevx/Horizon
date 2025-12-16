@@ -59,7 +59,6 @@ impl VertexArray {
 
     pub fn bind_material(&self, material: Arc<Material>) {
         self.bind();
-        unsafe { material.bind_layout(); }
     }
 }
 

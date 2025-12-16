@@ -11,19 +11,16 @@ use std::time::{Instant};
 use crate::rendering::material::Material;
 use crate::rendering::material::MaterialInstance;
 use crate::rendering::material::instance_material;
+use crate::rendering::mesh_data::shader_data_type::ShaderDataType;
 use crate::{
     rendering::{
         render_target::{RenderTarget},
         mesh_data::{
             buffer::Buffer, 
             vertex_array::VertexArray,
+            vertex_layout::VertexLayout,
         }, 
     },
-
-    tools::math::vector::{
-        Vec2, 
-        Vec3
-    }
 };
 
 
@@ -68,18 +65,13 @@ pub unsafe fn window_init(title: &str) -> WindowHandle {
 pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
     let mut last_frame_time = Instant::now();
 
-    //////////
-    // TEMP //
-    //////////
-    // let mesh: [Vertex; 4] = [
-    //     Vertex(Vec3::new([0.0,   0.0,   0.0]), Vec2::new([0.0, 1.0])),
-    //     Vertex(Vec3::new([100.0, 0.0,   0.0]), Vec2::new([1.0, 1.0])),
-    //     Vertex(Vec3::new([100.0, 100.0, 0.0]), Vec2::new([1.0, 0.0])),
-    //     Vertex(Vec3::new([0.0,   100.0, 0.0]), Vec2::new([0.0, 0.0])),
-    // ];
+    let layout: VertexLayout = VertexLayout::new(vec![
+        ShaderDataType::Float3,
+        ShaderDataType::Float2,
+    ]);
 
     let mesh = [
-        // coords                // texcoords
+        // coords              // texcoords
         0.0,   0.0,   0.0,       0.0, 1.0,
         100.0, 0.0,   0.0,       1.0, 1.0,
         100.0, 100.0, 0.0,       1.0, 0.0,
@@ -100,6 +92,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
 
     let vertex_array = VertexArray::new();
     vertex_array.bind();
+    layout.bind();
     let vertex_buffer = Buffer::new(gl::ARRAY_BUFFER);
     vertex_buffer.buffer_data(&mesh, gl::STATIC_DRAW);
     let index_buffer = Buffer::new(gl::ELEMENT_ARRAY_BUFFER);
