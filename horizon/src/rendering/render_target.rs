@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::rendering::{camera::{Camera, OrthographicCamera, PerspectiveCamera}, material::{MaterialInstance}, mesh_data::{vertex_array::VertexArray}, renderer::Renderer};
 
 pub const RENDER_TARGET_ORTHOGRAPHIC: i32 = 0b1 as i32;
@@ -48,7 +50,7 @@ impl RenderTarget {
         self.renderer.draw_requests(&self.camera);
     }
 
-    pub fn add_draw_request(&mut self, va: VertexArray, material: MaterialInstance) {
+    pub fn add_draw_request(&mut self, va: Arc<VertexArray>, material: MaterialInstance) {
         self.renderer.add_request(va, material);
     }
 

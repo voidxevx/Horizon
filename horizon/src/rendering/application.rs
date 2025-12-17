@@ -11,7 +11,12 @@ use std::time::{Instant};
 use crate::rendering::material::Material;
 use crate::rendering::material::MaterialInstance;
 use crate::rendering::material::instance_material;
+use crate::rendering::mesh_data::shader::ShaderUniform;
 use crate::set_attribute;
+use crate::tools::debug_widgets::widget::DebugGuiManager;
+use crate::tools::debug_widgets::widget::DebugWidget;
+use crate::tools::math::transforms::translation_matrix;
+use crate::tools::math::vector::Vector;
 use crate::tools::math::vector::{Vec3, Vec2};
 use crate::{
     rendering::{
@@ -81,7 +86,6 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
     ];
 
     
-
     let test_material: Arc<Material> = Material::new("./content/materials/default.mat")
         .expect("Error loading material");
 
@@ -93,7 +97,6 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
     vertex_buffer.buffer_data(&mesh, gl::STATIC_DRAW);
     let index_buffer = Buffer::new(gl::ELEMENT_ARRAY_BUFFER);
     index_buffer.buffer_data(&indeces, gl::STATIC_DRAW);
-    vertex_array.bind_material(test_material.clone());
 
     let shader = &test_material.shader_program;
 
@@ -111,7 +114,18 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
         );
     }
 
-    render_targets[0].add_draw_request(vertex_array, test_instance);
+    let mut other = instance_material(test_material);
+    other.set_uniform(&String::from("projectionMatrix"), ShaderUniform::MatrixUniform(translation_matrix(Vector::Length3(Vec3::new([100.0, 200.0, 0.0]))).unwrap()));
+
+    render_targets[0].add_draw_request(vertex_array.clone(), test_instance);
+    render_targets[0].add_draw_request(vertex_array.clone(), other);
+
+    let mut debug_manager: DebugGuiManager = DebugGuiManager::new();
+    
+    let test_widget: DebugWidget = DebugWidget::new(200.0, 400.0)
+        .located_at(100.0, 100.0);
+
+    debug_manager.add_widget(test_widget);
 
     //////////////////////
     // EVENT LOOP START //
@@ -146,6 +160,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
                         for render_target in &mut render_targets {
                             render_target.resize_capture(physical_size.width as f32, physical_size.height as f32);
                         }
+                        debug_manager.update_gui(physical_size.width as f32, physical_size.height as f32);
 
                     },
 
@@ -163,6 +178,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
                     for render_target in &mut render_targets {
                         render_target.capture();
                     }
+                    // debug_manager.draw_widgets();
                     handle.context.swap_buffers().unwrap();
                 }
             }
