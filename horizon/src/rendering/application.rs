@@ -12,6 +12,7 @@ use crate::rendering::material::Material;
 use crate::rendering::material::MaterialInstance;
 use crate::rendering::material::instance_material;
 use crate::rendering::mesh_data::shader::ShaderUniform;
+use crate::rendering::mesh_data::vertex_array::Vertex;
 use crate::set_attribute;
 use crate::tools::debug_widgets::widget::DebugGuiManager;
 use crate::tools::debug_widgets::widget::DebugWidget;
@@ -28,8 +29,7 @@ use crate::{
     },
 };
 
-#[repr(C, packed)]
-struct Vertex (Vec3, Vec2);
+
 
 pub struct  WindowHandle {
     pub event_loop: EventLoop<()>,
@@ -120,12 +120,13 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
     render_targets[0].add_draw_request(vertex_array.clone(), test_instance);
     render_targets[0].add_draw_request(vertex_array.clone(), other);
 
-    let mut debug_manager: DebugGuiManager = DebugGuiManager::new();
+    // let mut debug_manager: DebugGuiManager = DebugGuiManager::new();
     
-    let test_widget: DebugWidget = DebugWidget::new(200.0, 400.0)
-        .located_at(100.0, 100.0);
+    // let test_widget: DebugWidget = DebugWidget::new(200.0, 400.0)
+        // .located_at(100.0, 100.0);
 
-    debug_manager.add_widget(test_widget);
+    // debug_manager.add_widget(test_widget);
+
 
     //////////////////////
     // EVENT LOOP START //
@@ -160,7 +161,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
                         for render_target in &mut render_targets {
                             render_target.resize_capture(physical_size.width as f32, physical_size.height as f32);
                         }
-                        debug_manager.update_gui(physical_size.width as f32, physical_size.height as f32);
+                        // debug_manager.update_gui(physical_size.width as f32, physical_size.height as f32);
 
                     },
 
