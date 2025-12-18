@@ -2,8 +2,10 @@ use std::sync::Arc;
 
 use gl::{types::*};
 
-use crate::rendering::material::Material; 
+use crate::{rendering::{material::Material}, tools::math::vector::{Vec3, Vec2}}; 
 
+#[repr(C, packed)]
+pub struct Vertex (pub Vec3, pub Vec2);
 
 #[allow(unused)]
 pub struct VertexArray {
@@ -12,7 +14,7 @@ pub struct VertexArray {
 
 #[allow(unused)]
 impl VertexArray {
-    pub fn new() -> Self {
+    pub fn new() -> Arc<Self> {
 
         let mut id = 0;
         unsafe {
@@ -20,9 +22,9 @@ impl VertexArray {
             gl::BindVertexArray(id);
         }
 
-        Self {
-            id: id,
-        }
+        Arc::new(Self {
+                    id: id,
+                })
     }
 
     pub fn bind(&self) {
@@ -57,9 +59,6 @@ impl VertexArray {
         }
     }
 
-    pub fn bind_material(&self, material: Arc<Material>) {
-        self.bind();
-    }
 }
 
 impl Drop for VertexArray {

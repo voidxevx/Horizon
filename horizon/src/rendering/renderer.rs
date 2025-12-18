@@ -1,8 +1,8 @@
 use crate::{rendering::{camera::Camera, material::{MaterialInstance}, mesh_data::{shader::{ShaderUniform}, vertex_array::VertexArray}}, tools::math::matrix::{Mat4, Matrix}};
-use std::ptr;
+use std::{ptr, sync::Arc};
 
 struct RenderRequest {
-    va: VertexArray,
+    va: Arc<VertexArray>,
     material: MaterialInstance,
 }
 
@@ -20,9 +20,9 @@ impl Renderer {
         }
     }
 
-    pub fn add_request(&mut self, va: VertexArray, material: MaterialInstance) {
+    pub fn add_request(&mut self, va: Arc<VertexArray>, material: MaterialInstance) {
         self.render_requests.push(RenderRequest { 
-            va: va, 
+            va: va,
             material: material
         });
     }

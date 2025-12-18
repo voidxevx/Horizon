@@ -33,6 +33,7 @@ mod rendering {
         pub mod vertex_array;
         pub mod texture;
     }
+
 }
 
 const TITLE: &str = 

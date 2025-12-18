@@ -3,6 +3,9 @@ name = "horizon"
 version = "0.1.0"
 edition = "2024"
 
+[lints.rust]
+unused = "allow"
+
 [dependencies]
 glutin = "0.29.1"
 gl = "0.14.0"
