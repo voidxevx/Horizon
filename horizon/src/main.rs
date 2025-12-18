@@ -11,9 +11,6 @@ use crate::{
 };
 
 mod tools {
-    pub mod debug_widgets{
-        pub mod widget;
-    }
     pub mod math{
         pub mod vector;
         pub mod matrix;
@@ -57,5 +54,5 @@ fn main() {
     let handle = unsafe { window_init("Horizon") };
     
     // start main game loop
-    unsafe { window_event_loop(handle, vec![RENDER_TARGET_ORTHOGRAPHIC]); }
+    unsafe { window_event_loop(handle, RENDER_TARGET_ORTHOGRAPHIC); }
 }

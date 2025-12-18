@@ -13,9 +13,9 @@ use crate::rendering::material::MaterialInstance;
 use crate::rendering::material::instance_material;
 use crate::rendering::mesh_data::shader::ShaderUniform;
 use crate::rendering::mesh_data::vertex_array::Vertex;
+use crate::rendering::render_target;
+use crate::rendering::render_target::MeshBuilder;
 use crate::set_attribute;
-use crate::tools::debug_widgets::widget::DebugGuiManager;
-use crate::tools::debug_widgets::widget::DebugWidget;
 use crate::tools::math::transforms::translation_matrix;
 use crate::tools::math::vector::Vector;
 use crate::tools::math::vector::{Vec3, Vec2};
@@ -68,7 +68,7 @@ pub unsafe fn window_init(title: &str) -> WindowHandle {
 
 
 #[allow(unsafe_op_in_unsafe_fn, unused)]
-pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
+pub unsafe fn window_event_loop(handle: WindowHandle, target_type: i32) {
     let mut last_frame_time = Instant::now();
 
     let mesh = [
@@ -86,46 +86,58 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
     ];
 
     
-    let test_material: Arc<Material> = Material::new("./content/materials/default.mat")
-        .expect("Error loading material");
-
-    let test_instance: MaterialInstance = instance_material(test_material.clone());
-
+    
     let vertex_array = VertexArray::new();
     vertex_array.bind();
     let vertex_buffer = Buffer::new(gl::ARRAY_BUFFER);
     vertex_buffer.buffer_data(&mesh, gl::STATIC_DRAW);
     let index_buffer = Buffer::new(gl::ELEMENT_ARRAY_BUFFER);
     index_buffer.buffer_data(&indeces, gl::STATIC_DRAW);
+    
+    let test_material: Arc<Material> = Material::new("./content/materials/default.mat")
+        .expect("Error loading material");
 
     let shader = &test_material.shader_program;
-
+    
     let loc_attrib = shader.get_attrib_location("loc").expect("attribute not found");
     set_attribute!(vertex_array, loc_attrib, Vertex::0);
     let tex_attrib = shader.get_attrib_location("vertTexCoords").expect("attribute not found");
     set_attribute!(vertex_array, tex_attrib, Vertex::1);
 
+    let mut render_target = RenderTarget::new(target_type);
 
+    MeshBuilder::new(vertex_array.clone(), test_material.clone())
+        .uniform("projectionMatrix", 
+            ShaderUniform::MatrixUniform(
+                translation_matrix(Vector::Length3(Vec3::new([100.0, 0.0, 0.0]))).unwrap()
+            )
+        )
+    .attach(&mut render_target);
 
-    let mut render_targets: Vec<RenderTarget> = Vec::new();
-    for target_type in target_types {
-        render_targets.push(
-            RenderTarget::new(target_type)
-        );
-    }
+    MeshBuilder::new(vertex_array.clone(), test_material.clone())
+        .uniform("projectionMatrix", 
+            ShaderUniform::MatrixUniform(
+                translation_matrix(Vector::Length3(Vec3::new([300.0, 0.0, 0.0]))).unwrap()
+            )
+        )
+    .attach(&mut render_target);
 
-    let mut other = instance_material(test_material);
-    other.set_uniform(&String::from("projectionMatrix"), ShaderUniform::MatrixUniform(translation_matrix(Vector::Length3(Vec3::new([100.0, 200.0, 0.0]))).unwrap()));
+    MeshBuilder::new(vertex_array.clone(), test_material.clone())
+        .uniform("projectionMatrix", 
+            ShaderUniform::MatrixUniform(
+                translation_matrix(Vector::Length3((Vec3::new([300.0, 450.0, 0.0])))).unwrap()
+            )
+        )
+    .attach(&mut render_target);
 
-    render_targets[0].add_draw_request(vertex_array.clone(), test_instance);
-    render_targets[0].add_draw_request(vertex_array.clone(), other);
+    MeshBuilder::new(vertex_array.clone(), test_material.clone())
+        .uniform("projectionMatrix", 
+            ShaderUniform::MatrixUniform(
+                translation_matrix(Vector::Length3((Vec3::new([100.0, 450.0, 0.0])))).unwrap()
+            )
+        )
+    .attach(&mut render_target);
 
-    // let mut debug_manager: DebugGuiManager = DebugGuiManager::new();
-    
-    // let test_widget: DebugWidget = DebugWidget::new(200.0, 400.0)
-        // .located_at(100.0, 100.0);
-
-    // debug_manager.add_widget(test_widget);
 
 
     //////////////////////
@@ -158,11 +170,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
                     WindowEvent::Resized(physical_size) => {
                         handle.context.resize(physical_size);
                         unsafe { gl::Viewport(0, 0, physical_size.width as i32, physical_size.height as i32); }
-                        for render_target in &mut render_targets {
-                            render_target.resize_capture(physical_size.width as f32, physical_size.height as f32);
-                        }
-                        // debug_manager.update_gui(physical_size.width as f32, physical_size.height as f32);
-
+                        render_target.resize_capture(physical_size.width as f32, physical_size.height as f32);
                     },
 
                     _ => ()
@@ -176,9 +184,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_types: Vec<i32>) {
                 unsafe {
                     gl::ClearColor(0.0, 0.0, 0.0, 1.0,);
                     gl::Clear(gl::COLOR_BUFFER_BIT);
-                    for render_target in &mut render_targets {
-                        render_target.capture();
-                    }
+                    render_target.capture();
                     // debug_manager.draw_widgets();
                     handle.context.swap_buffers().unwrap();
                 }

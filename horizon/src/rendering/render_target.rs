@@ -1,9 +1,33 @@
 use std::sync::Arc;
 
-use crate::rendering::{camera::{Camera, OrthographicCamera, PerspectiveCamera}, material::{MaterialInstance}, mesh_data::{vertex_array::VertexArray}, renderer::Renderer};
+use crate::rendering::{camera::{Camera, OrthographicCamera, PerspectiveCamera}, material::{self, Material, MaterialInstance, instance_material}, mesh_data::{shader::ShaderUniform, vertex_array::VertexArray}, renderer::Renderer};
 
 pub const RENDER_TARGET_ORTHOGRAPHIC: i32 = 0b1 as i32;
 pub const RENDER_TARGET_PERSPECTIVE: i32 = 0b10 as i32;
+
+pub struct MeshBuilder {
+    va: Arc<VertexArray>,
+    mat_inst: MaterialInstance,
+}
+
+impl MeshBuilder {
+    pub fn new(va: Arc<VertexArray>, mat: Arc<Material>) -> Self {
+        let inst = instance_material(mat);
+        Self {
+            va: va,
+            mat_inst: inst
+        }
+    }
+
+    pub fn uniform(mut self, name: &str, val: ShaderUniform) -> Self {
+        self.mat_inst.set_uniform(&String::from(name), val);
+        self
+    }
+
+    pub fn attach(self, target: &mut RenderTarget) {
+        target.add_mesh(self);
+    }
+}
 
 #[allow(unused)]
 pub struct RenderTarget {
@@ -50,8 +74,8 @@ impl RenderTarget {
         self.renderer.draw_requests(&self.camera);
     }
 
-    pub fn add_draw_request(&mut self, va: Arc<VertexArray>, material: MaterialInstance) {
-        self.renderer.add_request(va, material);
+    pub fn add_mesh(&mut self, mesh: MeshBuilder) {
+        self.renderer.add_request(mesh.va, mesh.mat_inst);
     }
 
 }
