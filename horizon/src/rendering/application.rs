@@ -1,42 +1,57 @@
-use gl::types::GLint;
-use gl::types::GLsizei;
-use glutin::ContextBuilder;
-use glutin::ContextWrapper;
-use glutin::PossiblyCurrent;
-use glutin::event::*;
-use glutin::event_loop::*;
-use glutin::window::*;
+use glutin::{
+    ContextBuilder,
+    ContextWrapper,
+    PossiblyCurrent,
+    event::*,
+    event_loop::*,
+    window::*,
+};
 
-use std::sync::Arc;
-use std::time::{Instant};
+use std::{
+    sync::Arc,
+    time::Instant,
+};
 
-use crate::rendering::material::Material;
-use crate::rendering::material::MaterialInstance;
-use crate::rendering::material::instance_material;
-use crate::rendering::mesh_data::shader::ShaderUniform;
-use crate::rendering::mesh_data::shader::ShaderUniformType;
-use crate::rendering::mesh_data::shader_types::DataTypes;
-use crate::rendering::mesh_data::vertex_layout::VertexLayout;
-use crate::rendering::render_target;
-use crate::rendering::render_target::MeshBuilder;
-use crate::set_attribute;
-use crate::tools::math::transforms::rotation_mat4_euler_x;
-use crate::tools::math::transforms::rotation_mat4_euler_y;
-use crate::tools::math::transforms::rotation_mat4_euler_z;
-use crate::tools::math::transforms::scalar_matrix;
-use crate::tools::math::transforms::translation_matrix;
-use crate::tools::math::vector::Vec4;
-use crate::tools::math::vector::Vector;
-use crate::tools::math::vector::{Vec3, Vec2};
 use crate::{
     rendering::{
-        render_target::{RenderTarget},
+        material::{
+            Material,
+            MaterialInstance,
+            instance_material,
+        },
         mesh_data::{
-            buffer::Buffer, 
+            shader::{
+                ShaderUniform,
+                ShaderUniformType,
+            },
+            shader_types::DataTypes,
+            vertex_layout::VertexLayout,
+            buffer::Buffer,
             vertex_array::VertexArray,
-        }, 
+        },
+        render_target::{
+            RenderTarget,
+            MeshBuilder,
+        },
     },
+    tools::{
+        math::{
+            transforms::{
+                rotation_mat4_euler_z,
+                scalar_matrix,
+                translation_matrix,
+            },
+            vector::{
+                Vector,
+                Vec4,
+                Vec3,
+                Vec2
+            }
+        }
+    },
+    set_attribute
 };
+
 
 
 
@@ -80,8 +95,12 @@ pub unsafe fn window_init(title: &str) -> WindowHandle {
 pub unsafe fn window_event_loop(handle: WindowHandle, target_type: i32) {
     let mut last_frame_time = Instant::now();
 
-    let test_material: Arc<Material> = Material::new("./content/materials/default.mat")
+    let teto_material: Arc<Material> = Material::new("./content/materials/teto.mat")
         .expect("Error loading material");
+
+    let miku_material: Arc<Material> = Material::new("./content/materials/miku.mat")
+        .expect("Error loading material");
+
 
 
     let mesh: Vec<f32> = vec![
@@ -105,8 +124,6 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_type: i32) {
     let index_buffer = Buffer::new(gl::ELEMENT_ARRAY_BUFFER);
     index_buffer.buffer_data(&indecis[..], gl::STATIC_DRAW);
 
-    let shader = &test_material.shader_program;
-    
     vertex_array.bind();
     let layout = VertexLayout::new()
         .attrib(DataTypes::Float3)
@@ -115,7 +132,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_type: i32) {
 
     let mut render_target = RenderTarget::new(target_type);
 
-    MeshBuilder::new(vertex_array.clone(), test_material.clone())
+    let teto = MeshBuilder::new(vertex_array.clone(), teto_material.clone())
         .uniform("projectionMatrix",
             ShaderUniform::MatrixUniform(
                 translation_matrix(Vector::Length3(Vec3::new([450.0, 450.0, 0.0]))).unwrap()
@@ -128,7 +145,25 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_type: i32) {
         )
         .uniform("rotationMatrix", 
             ShaderUniform::MatrixUniform(
-                rotation_mat4_euler_z(35.0 * (3.15 / 180.0))
+                rotation_mat4_euler_z(35.0 * (3.14 / 180.0))
+            )
+        )
+    .attach(&mut render_target);
+
+    let miku = MeshBuilder::new(vertex_array.clone(), miku_material.clone())
+        .uniform("projectionMatrix",
+            ShaderUniform::MatrixUniform(
+                translation_matrix(Vector::Length3(Vec3::new([750.0, 950.0, 0.0]))).unwrap()
+            )
+        )
+        .uniform("scalarMatrix",
+            ShaderUniform::MatrixUniform(
+                scalar_matrix(Vector::Length4(Vec4::new([5.0, 2.5, 1.0, 1.0])))
+            )
+        )
+        .uniform("rotationMatrix", 
+            ShaderUniform::MatrixUniform(
+                rotation_mat4_euler_z(-15.0 * (3.14 / 180.0))
             )
         )
     .attach(&mut render_target);
