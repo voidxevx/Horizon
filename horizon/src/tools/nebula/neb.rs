@@ -11,6 +11,13 @@ unsafe extern "C"
 {
     pub unsafe fn neb_init();
     pub unsafe fn neb_link_module(name: *const c_char, path: *const c_char);
+    pub unsafe fn neb_load_module(mod_name: *const c_char);
+}
+
+#[allow(unsafe_op_in_unsafe_fn)]
+pub unsafe fn load_module(name: &str) {
+    let name_cstring: CString = CString::new(name).unwrap();
+    neb_load_module(name_cstring.as_ptr());
 }
 
 #[allow(unsafe_op_in_unsafe_fn)]

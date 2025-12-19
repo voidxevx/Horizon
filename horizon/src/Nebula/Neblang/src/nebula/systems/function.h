@@ -1,53 +1,73 @@
 #pragma once
 
 #include "../DataTypes/types.h"
+#include "../State/generation/token.h"
 
 #include <vector>
 #include <functional>
-#include <utility>
+#include <variant>
 
-namespace neb::function
+namespace neb::sys
 {
-
-	struct FunctionTemplate
-	{
-		std::vector<type::PropertyID> InputTypes;
-		type::PropertyID OutputType;
-	};
-
-	class IFunction
+	
+	class IFunctionImplementation
 	{
 	public:
-		virtual ~IFunction() = default;
+		virtual ~IFunctionImplementation() = default;
 
-		inline const type::PropertyID GetID() const { return m_FunctionID; }
+		inline void setReturnType(type::PropertyID type) { m_ReturnType = type; }
+		inline const type::PropertyID getReturnType() const { return m_ReturnType; }
 
-	protected:
-		IFunction(type::PropertyID id)
-			: m_FunctionID(id)
-		{}
+		inline void setInputs(std::vector<type::Property> inputs) { m_Inputs = inputs; }
+		inline const std::vector<type::Property>& getInputs() const { return m_Inputs; }
 
 	private:
-		type::PropertyID m_FunctionID;
+		std::vector<type::Property> m_Inputs;
+		type::PropertyID m_ReturnType = 0;
 	};
 
-	class NativeFunction : public IFunction
+	class NativeFunctionImplementation : public IFunctionImplementation
 	{
 	public:
-		NativeFunction(type::PropertyID id)
-			:IFunction(id)
-		{}
-		virtual ~NativeFunction() = default;
-
-		void AddImplementation(FunctionTemplate templ, std::function<int()> lambda)
+		NativeFunctionImplementation(std::vector<type::Property> inputs, type::PropertyID retType, std::function<void()> lambda)
+			: m_Function(lambda)
 		{
-			m_Implementations.push_back(std::make_pair(templ, lambda));
+			setReturnType(retType);
+			setInputs(inputs);
 		}
+		virtual ~NativeFunctionImplementation() = default;
 
 	private:
-		std::vector<std::pair<FunctionTemplate, std::function<int()>>> m_Implementations;
+		std::function<void()> m_Function;
 	};
 
-	// TODO: LocalFunctions -> need byte nodes first
+	class UncompiledFunctionImplementation : public IFunctionImplementation
+	{
+	public:
+		UncompiledFunctionImplementation() = default;
+		virtual ~UncompiledFunctionImplementation() = default;
+
+		inline void setTokens(std::vector<gen::Token> tokens) { m_Tokens = tokens; }
+
+	private:
+		std::vector<gen::Token> m_Tokens;
+	};
+
+	// TODO: compiled implementation
+
+	typedef std::variant<NativeFunctionImplementation, UncompiledFunctionImplementation> functionImpl;
+
+	class Function
+	{
+	public:
+		Function() = default;
+
+		inline void addImplementation(functionImpl impl) { m_Implementations.push_back(impl); };
+
+		// TODO: match implementations
+
+	private:
+		std::vector<functionImpl> m_Implementations;
+	};
 
 }

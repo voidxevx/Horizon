@@ -8,21 +8,16 @@
 
 namespace neb
 {
-
-	struct TraitMethod
+	// TODO: traits store functions differently than normal functions
+	/*struct TraitMethod
 	{
-		function::FunctionTemplate Template;
-		std::map<type::PropertyID, function::IFunction*> Implementations;
+		std::map<type::PropertyID, sys::functionImpl> Implementations;
 
-		TraitMethod(function::FunctionTemplate templ)
-			: Template(templ)
+		TraitMethod(std::vector<type::Property> inputs, type::PropertyID retType)
+			: Inputs(inputs)
+			, ReturnType(retType)
 		{}
 
-		~TraitMethod()
-		{
-			for (auto& impl : Implementations)
-				delete impl.second;
-		}
 	};
 
 	class TraitVTable
@@ -62,6 +57,6 @@ namespace neb
 	private:
 		std::map<type::PropertyID, TraitMethod> m_Methods;
 		std::set<type::PropertyID> m_RequiredComponents;
-	};
+	};*/
 
 }

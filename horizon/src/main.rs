@@ -120,6 +120,10 @@ fn main() {
 
         set_error_pipe_message!("Failed to link module");
         neb::link_file("./content/scripts/test.neb");
+        neb::link_file("./content/scripts/root.neb");
+
+        set_error_pipe_message!("Module load error");
+        neb::load_module("root");
 
         set_error_pipe_message!("Runtime error");
         window_event_loop(handle, render_target, &camera);

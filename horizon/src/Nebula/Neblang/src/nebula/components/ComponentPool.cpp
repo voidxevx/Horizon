@@ -6,6 +6,7 @@ namespace neb
 
 	ComponentMemoryAllocator::ComponentMemoryAllocator(type::PropertyID& owningEntity, const size_t allocationSize, const std::vector<type::PropertyID>& properties)
 		: OwningEntity(owningEntity)
+		, AllocationSize(allocationSize)
 	{
 		Data = (data::IDataInstance**)malloc(allocationSize * sizeof(data::IDataInstance*));
 		const data::TypeRegistry const* reg = data::TypeRegistry::Get();

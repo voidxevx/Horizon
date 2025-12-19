@@ -21,19 +21,14 @@ namespace neb
 			}
 		}
 
-		~ComponentVTable()
-		{
-			for (auto& method : m_Methods)
-				delete method.second;
-		}
 
 		void
-		AddMethod(type::PropertyID id, function::IFunction* method)
+		AddMethod(type::PropertyID id, sys::Function method)
 		{
 			m_Methods[id] = method;
 		}
 
-		inline std::optional<function::IFunction*> 
+		inline std::optional<sys::Function>
 		GetMethod(const type::PropertyID& id)
 		const 
 		{
@@ -53,7 +48,7 @@ namespace neb
 		std::vector<type::PropertyID> m_ComponentProperties; // list of property types in the order that they are emplaced.
 		std::map<type::PropertyID, size_t> m_PropertyLocations; // maps property ids to their location within the property list. this will be used to find where the property is located in virtual memory.
 
-		std::map<type::PropertyID, function::IFunction*> m_Methods;
+		std::map<type::PropertyID, sys::Function> m_Methods;
 	};
 
 }

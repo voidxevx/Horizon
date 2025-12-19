@@ -1,4 +1,8 @@
 module test
-#use
-#end
 
+_dep:
+
+_code:
+global squareAdd[A: i32 B: i32]: i32 {
+    
+}

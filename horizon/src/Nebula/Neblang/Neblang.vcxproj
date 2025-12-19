@@ -90,17 +90,19 @@
     <ClInclude Include="src\nebula\DataTypes\Data.h" />
     <ClInclude Include="src\nebula\DataTypes\types.h" />
     <ClInclude Include="src\nebula\DataTypes\VariableScope.h" />
-    <ClInclude Include="src\nebula\Debug\ErrorHandler.h" />
+    <ClInclude Include="src\nebula\ErrorHandling\ErrorHandler.h" />
     <ClInclude Include="src\nebula\Entity\Entity.h" />
-    <ClInclude Include="src\nebula\state.h" />
+    <ClInclude Include="src\nebula\State\generation\token.h" />
+    <ClInclude Include="src\nebula\State\state.h" />
     <ClInclude Include="src\nebula\systems\function.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\nebula\components\ComponentPool.cpp" />
     <ClCompile Include="src\nebula\DataTypes\Data.cpp" />
-    <ClCompile Include="src\nebula\DataTypes\types.cpp" />
     <ClCompile Include="src\nebula\DataTypes\VariableScope.cpp" />
-    <ClCompile Include="src\nebula\state.cpp" />
+    <ClCompile Include="src\nebula\ErrorHandling\ErrorHandler.cpp" />
+    <ClCompile Include="src\nebula\State\state.cpp" />
+    <ClCompile Include="src\nebula\State\state_generation.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

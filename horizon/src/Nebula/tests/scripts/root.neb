@@ -1,6 +1,11 @@
 module root
-use ./tests/scripts/nibble.neb
 
+
+_dep:
+test
+
+
+_code:
 global root(): void
 {
 	

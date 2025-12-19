@@ -8,8 +8,8 @@
 
 namespace neb
 {
-
-	struct TraitInterfaceMethod
+	// TODO: like traits interface traits also store methods differently than normal functions
+	/*struct TraitInterfaceMethod
 	{
 		function::FunctionTemplate Template;
 		std::map<type::PropertyID, function::IFunction*> Implementations;
@@ -68,6 +68,6 @@ namespace neb
 
 	private:
 		std::map<type::PropertyID, TraitInterfaceMethod> m_Methods;
-	};
+	};*/
 
 }

@@ -13,18 +13,13 @@ namespace neb
 	struct InterfaceFunction
 	{
 		std::set<type::PropertyID> RequiredComponents;
-		function::IFunction* Function;
+		sys::Function Function;
 
-		InterfaceFunction(std::set<type::PropertyID> requirements, function::IFunction* function)
+		InterfaceFunction(std::set<type::PropertyID> requirements, sys::Function function)
 			: RequiredComponents(requirements)
 			, Function(function)
 		{}
 
-		~InterfaceFunction()
-		{
-			delete Function;
-			Function = nullptr;
-		}
 	};
 
 	class InterfaceVtable
@@ -33,7 +28,7 @@ namespace neb
 		InterfaceVtable() = default;
 
 		void
-		AddFunction(type::PropertyID id, function::IFunction* method, std::set<type::PropertyID> requirements)
+		AddFunction(type::PropertyID id, sys::Function method, std::set<type::PropertyID> requirements)
 		{
 			m_Functions[id] = InterfaceFunction{ requirements, method };
 		}

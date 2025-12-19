@@ -11,7 +11,7 @@ namespace neb::entity
 	class EntityVTable 
 	{
 	public:
-		EntityVTable(std::set<PropertyID> components, std::set<PropertyID> archetypes, std::set<PropertyID> traits, function::IFunction* constructor)
+		EntityVTable(std::set<type::PropertyID> components, std::set<type::PropertyID> archetypes, std::set<type::PropertyID> traits, sys::Function constructor)
 			: m_Components(components)
 			, m_Archetypes(archetypes)
 			, m_Traits(traits)
@@ -19,10 +19,10 @@ namespace neb::entity
 		{}
 
 	private:
-		std::set<PropertyID> m_Components;
-		std::set<PropertyID> m_Archetypes;
-		std::set<PropertyID> m_Traits;
-		function::IFunction* m_Constructor;
+		std::set<type::PropertyID> m_Components;
+		std::set<type::PropertyID> m_Archetypes;
+		std::set<type::PropertyID> m_Traits;
+		sys::Function m_Constructor;
 	};
 
 }

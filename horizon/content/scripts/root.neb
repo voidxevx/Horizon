@@ -1,8 +1,10 @@
 module root
-#use
-    test
-#end
+this section is free for typeing long descriptions about this module without a comment block.
 
-global root(): void {
-    
+_dep:
+test
+
+_code:
+global root {
+    squareAdd(12, 30);
 }

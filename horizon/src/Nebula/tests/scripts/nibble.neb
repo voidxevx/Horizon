@@ -85,6 +85,11 @@ component TransformComponent
 	method getTransform(): mat4 {
 		// ...
 	}
+
+	// on attach deligate
+	on attach {
+
+	}
 }
 
 // entity archetype
@@ -209,7 +214,7 @@ entity Player [Avatar]
 
 	When an entity is created it will call the deligate: on new.
 	similarly deleting an enitity will call the deligate: on destroy.
-	each game tick will call the deligate: on update for each entity on the system (deltaTime is a accessable variable within the scope).
+	each game tick will call the deligate: on update for each entity on the system (deltaTime is an accessable variable within the scope).
 
 	Each deligate function has the entity as the scopes root allowing direct access to its components using the this variable.
 */

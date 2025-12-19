@@ -72,19 +72,14 @@ namespace neb::data
 	class IDataType
 	{
 	public:
-		virtual ~IDataType()
-		{
-			for (auto& method : m_Methods)
-				delete method.second;
-		}
 
 		void
-		AddMethod(type::PropertyID id, function::IFunction* method)
+		AddMethod(type::PropertyID id, sys::Function method)
 		{
 			m_Methods[id] = method;
 		}
 
-		inline std::optional<function::IFunction*> GetMethod(type::PropertyID id) const {
+		inline std::optional<sys::Function> GetMethod(type::PropertyID id) const {
 			if (m_Methods.count(id) > 0)
 				return m_Methods.at(id);
 			else
@@ -98,7 +93,7 @@ namespace neb::data
 
 	private:
 		type::PropertyID m_TypeID;
-		std::map<type::PropertyID, function::IFunction*> m_Methods;
+		std::map<type::PropertyID, sys::Function> m_Methods;
 	};
 	
 

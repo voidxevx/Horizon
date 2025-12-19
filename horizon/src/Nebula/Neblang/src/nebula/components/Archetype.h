@@ -13,18 +13,18 @@ namespace neb
 	class ArchetypeVTable
 	{
 	public:
-		ArchetypeVTable(std::set<PropertyID> components)
+		ArchetypeVTable(std::set<type::PropertyID> components)
 			: m_Components(components)
 		{}
 
 		void
-		AddFunction(PropertyID id, function::IFunction* method)
+		AddFunction(type::PropertyID id, sys::Function method)
 		{
 			m_Functions[id] = method;
 		}
 
-		inline std::optional<function::IFunction*> 
-		GetFunction(const PropertyID& id) 
+		inline std::optional<sys::Function>
+		GetFunction(const type::PropertyID& id) 
 		const 
 		{
 			if (m_Functions.count(id) > 0)
@@ -33,11 +33,11 @@ namespace neb
 				return std::nullopt;
 		}
 
-		inline const bool HasComponent(const PropertyID& component) const { return m_Components.contains(component); }
+		inline const bool HasComponent(const type::PropertyID& component) const { return m_Components.contains(component); }
 
 	private:
-		std::set<PropertyID> m_Components;
-		std::map<PropertyID, function::IFunction*> m_Functions;
+		std::set<type::PropertyID> m_Components;
+		std::map<type::PropertyID, sys::Function> m_Functions;
 	};
 
 }
