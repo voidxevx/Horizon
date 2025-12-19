@@ -79,7 +79,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_type: i32) {
         .expect("Error loading material");
 
 
-    let mesh: [f32; 20] = [
+    let mesh: Vec<f32> = vec![
         0.0,   0.0,   0.0,    0.0, 1.0,
         100.0, 0.0,   0.0,    1.0, 1.0,
         100.0, 100.0, 0.0,    1.0, 0.0,
@@ -87,20 +87,18 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_type: i32) {
     ];
 
 
-    let indeces: [i32; 6] = [
-        0, 1, 2,
-        2, 3, 0,
+    let indecis = vec![
+        0, 1, 2, 
+        2, 3, 0
     ];
-
     
     
     let vertex_array = VertexArray::new();
     vertex_array.bind();
     let vertex_buffer = Buffer::new(gl::ARRAY_BUFFER);
-    vertex_buffer.buffer_data(&mesh, gl::STATIC_DRAW);
+    vertex_buffer.buffer_data(&mesh[..], gl::STATIC_DRAW);
     let index_buffer = Buffer::new(gl::ELEMENT_ARRAY_BUFFER);
-    index_buffer.buffer_data(&indeces, gl::STATIC_DRAW);
-    
+    index_buffer.buffer_data(&indecis[..], gl::STATIC_DRAW);
 
     let shader = &test_material.shader_program;
     
@@ -120,29 +118,6 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_type: i32) {
         )
     .attach(&mut render_target);
 
-    MeshBuilder::new(vertex_array.clone(), test_material.clone())
-        .uniform("projectionMatrix", 
-            ShaderUniform::MatrixUniform(
-                translation_matrix(Vector::Length3(Vec3::new([300.0, 0.0, 0.0]))).unwrap()
-            )
-        )
-    .attach(&mut render_target);
-
-    MeshBuilder::new(vertex_array.clone(), test_material.clone())
-        .uniform("projectionMatrix", 
-            ShaderUniform::MatrixUniform(
-                translation_matrix(Vector::Length3((Vec3::new([300.0, 450.0, 0.0])))).unwrap()
-            )
-        )
-    .attach(&mut render_target);
-
-    MeshBuilder::new(vertex_array.clone(), test_material.clone())
-        .uniform("projectionMatrix", 
-            ShaderUniform::MatrixUniform(
-                translation_matrix(Vector::Length3((Vec3::new([100.0, 450.0, 0.0])))).unwrap()
-            )
-        )
-    .attach(&mut render_target);
 
 
 
@@ -175,7 +150,7 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_type: i32) {
                     /* window resize ----- */
                     WindowEvent::Resized(physical_size) => {
                         handle.context.resize(physical_size);
-                        unsafe { gl::Viewport(0, 0, physical_size.width as i32, physical_size.height as i32); }
+                        gl::Viewport(0, 0, physical_size.width as i32, physical_size.height as i32); 
                         render_target.resize_capture(physical_size.width as f32, physical_size.height as f32);
                     },
 
@@ -191,7 +166,6 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_type: i32) {
                     gl::ClearColor(0.0, 0.0, 0.0, 1.0,);
                     gl::Clear(gl::COLOR_BUFFER_BIT);
                     render_target.capture();
-                    // debug_manager.draw_widgets();
                     handle.context.swap_buffers().unwrap();
                 }
             }
