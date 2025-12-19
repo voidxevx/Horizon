@@ -4,9 +4,6 @@ use gl::{types::*};
 
 use crate::{rendering::{material::Material}, tools::math::vector::{Vec3, Vec2}}; 
 
-#[repr(C, packed)]
-pub struct Vertex (pub Vec3, pub Vec2);
-
 #[allow(unused)]
 pub struct VertexArray {
     pub id: GLuint,

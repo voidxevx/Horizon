@@ -1,3 +1,5 @@
+use gl::types::GLint;
+use gl::types::GLsizei;
 use glutin::ContextBuilder;
 use glutin::ContextWrapper;
 use glutin::PossiblyCurrent;
@@ -12,7 +14,9 @@ use crate::rendering::material::Material;
 use crate::rendering::material::MaterialInstance;
 use crate::rendering::material::instance_material;
 use crate::rendering::mesh_data::shader::ShaderUniform;
-use crate::rendering::mesh_data::vertex_array::Vertex;
+use crate::rendering::mesh_data::shader::ShaderUniformType;
+use crate::rendering::mesh_data::shader_types::DataTypes;
+use crate::rendering::mesh_data::vertex_layout::VertexLayout;
 use crate::rendering::render_target;
 use crate::rendering::render_target::MeshBuilder;
 use crate::set_attribute;
@@ -71,12 +75,15 @@ pub unsafe fn window_init(title: &str) -> WindowHandle {
 pub unsafe fn window_event_loop(handle: WindowHandle, target_type: i32) {
     let mut last_frame_time = Instant::now();
 
-    let mesh = [
-        // coords              // texcoords
-        Vertex( Vec3::new([0.0,   0.0,   0.0]), Vec2::new([0.0, 1.0]) ),
-        Vertex( Vec3::new([100.0, 0.0,   0.0]), Vec2::new([1.0, 1.0]) ),
-        Vertex( Vec3::new([100.0, 100.0, 0.0]), Vec2::new([1.0, 0.0]) ),
-        Vertex( Vec3::new([0.0,   100.0, 0.0]), Vec2::new([0.0, 0.0]) ),
+    let test_material: Arc<Material> = Material::new("./content/materials/default.mat")
+        .expect("Error loading material");
+
+
+    let mesh: [f32; 20] = [
+        0.0,   0.0,   0.0,    0.0, 1.0,
+        100.0, 0.0,   0.0,    1.0, 1.0,
+        100.0, 100.0, 0.0,    1.0, 0.0,
+        0.0,   100.0, 0.0,    0.0, 0.0,
     ];
 
 
@@ -94,15 +101,14 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_type: i32) {
     let index_buffer = Buffer::new(gl::ELEMENT_ARRAY_BUFFER);
     index_buffer.buffer_data(&indeces, gl::STATIC_DRAW);
     
-    let test_material: Arc<Material> = Material::new("./content/materials/default.mat")
-        .expect("Error loading material");
 
     let shader = &test_material.shader_program;
     
-    let loc_attrib = shader.get_attrib_location("loc").expect("attribute not found");
-    set_attribute!(vertex_array, loc_attrib, Vertex::0);
-    let tex_attrib = shader.get_attrib_location("vertTexCoords").expect("attribute not found");
-    set_attribute!(vertex_array, tex_attrib, Vertex::1);
+    vertex_array.bind();
+    let layout = VertexLayout::new()
+        .attrib(DataTypes::Float3)
+        .attrib(DataTypes::Float2);
+    layout.bind_attribute();
 
     let mut render_target = RenderTarget::new(target_type);
 

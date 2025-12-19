@@ -1,0 +1,14 @@
+[layout]
+vec3 vec2
+
+[material]
+./contents/materials/default.mat
+
+[verteces]
+0   0   0   0 1
+100 0   0   1 1
+100 100 0   1 0
+0   100 0   0 0
+
+[indecis]
+0 1 2 2 3 0
