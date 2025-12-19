@@ -6,11 +6,13 @@ in vec3 loc;
 in vec2 vertTexCoords;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
+uniform mat4 scalarMatrix;
+uniform mat4 rotationMatrix;
 
 out vec2 texCoord;
 
 void main() {
-    gl_Position = vec4(loc, 1.0) * projectionMatrix * viewMatrix;
+    gl_Position = vec4(loc, 1.0) * scalarMatrix * rotationMatrix * projectionMatrix * viewMatrix;
     texCoord = vertTexCoords;
 }
 

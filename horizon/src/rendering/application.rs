@@ -20,7 +20,12 @@ use crate::rendering::mesh_data::vertex_layout::VertexLayout;
 use crate::rendering::render_target;
 use crate::rendering::render_target::MeshBuilder;
 use crate::set_attribute;
+use crate::tools::math::transforms::rotation_mat4_euler_x;
+use crate::tools::math::transforms::rotation_mat4_euler_y;
+use crate::tools::math::transforms::rotation_mat4_euler_z;
+use crate::tools::math::transforms::scalar_matrix;
 use crate::tools::math::transforms::translation_matrix;
+use crate::tools::math::vector::Vec4;
 use crate::tools::math::vector::Vector;
 use crate::tools::math::vector::{Vec3, Vec2};
 use crate::{
@@ -80,15 +85,15 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_type: i32) {
 
 
     let mesh: Vec<f32> = vec![
-        0.0,   0.0,   0.0,    0.0, 1.0,
-        100.0, 0.0,   0.0,    1.0, 1.0,
-        100.0, 100.0, 0.0,    1.0, 0.0,
-        0.0,   100.0, 0.0,    0.0, 0.0,
+        -50.0,   -50.0,   0.0,    0.0, 1.0,
+        50.0, -50.0,   0.0,    1.0, 1.0,
+        50.0, 50.0, 0.0,    1.0, 0.0,
+        -50.0,   50.0, 0.0,    0.0, 0.0,
     ];
 
 
     let indecis = vec![
-        0, 1, 2, 
+        0, 1, 2,
         2, 3, 0
     ];
     
@@ -111,9 +116,19 @@ pub unsafe fn window_event_loop(handle: WindowHandle, target_type: i32) {
     let mut render_target = RenderTarget::new(target_type);
 
     MeshBuilder::new(vertex_array.clone(), test_material.clone())
-        .uniform("projectionMatrix", 
+        .uniform("projectionMatrix",
             ShaderUniform::MatrixUniform(
-                translation_matrix(Vector::Length3(Vec3::new([100.0, 0.0, 0.0]))).unwrap()
+                translation_matrix(Vector::Length3(Vec3::new([450.0, 450.0, 0.0]))).unwrap()
+            )
+        )
+        .uniform("scalarMatrix",
+            ShaderUniform::MatrixUniform(
+                scalar_matrix(Vector::Length4(Vec4::new([5.0, 2.5, 1.0, 1.0])))
+            )
+        )
+        .uniform("rotationMatrix", 
+            ShaderUniform::MatrixUniform(
+                rotation_mat4_euler_z(35.0 * (3.15 / 180.0))
             )
         )
     .attach(&mut render_target);
