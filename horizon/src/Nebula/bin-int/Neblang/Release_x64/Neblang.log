@@ -1,7 +1,2 @@
-﻿  Data.cpp
-  VariableScope.cpp
-  state.cpp
-  state_generation.cpp
-  ComponentPool.cpp
-C:\Users\Owner\projects\horizon\horizon\src\Nebula\Neblang\src\nebula\components\ComponentPool.cpp(12,28): warning C4114: same type qualifier used more than once
+﻿  poolTest.cpp
   Neblang.vcxproj -> C:\Users\Owner\projects\horizon\horizon\src\Nebula\bin\Neblang\Release_x64\Neblang.lib

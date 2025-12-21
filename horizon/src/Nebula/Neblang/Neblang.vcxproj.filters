@@ -60,6 +60,9 @@
     <ClInclude Include="src\nebula\State\generation\token.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\nebula\DataTypes\poolTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\nebula\DataTypes\Data.cpp">
@@ -78,6 +81,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\nebula\ErrorHandling\ErrorHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\nebula\DataTypes\poolTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

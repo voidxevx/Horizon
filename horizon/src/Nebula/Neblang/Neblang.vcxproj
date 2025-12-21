@@ -88,6 +88,7 @@
     <ClInclude Include="src\nebula\components\Trait.h" />
     <ClInclude Include="src\nebula\components\TraitInterface.h" />
     <ClInclude Include="src\nebula\DataTypes\Data.h" />
+    <ClInclude Include="src\nebula\DataTypes\poolTest.h" />
     <ClInclude Include="src\nebula\DataTypes\types.h" />
     <ClInclude Include="src\nebula\DataTypes\VariableScope.h" />
     <ClInclude Include="src\nebula\ErrorHandling\ErrorHandler.h" />
@@ -99,6 +100,7 @@
   <ItemGroup>
     <ClCompile Include="src\nebula\components\ComponentPool.cpp" />
     <ClCompile Include="src\nebula\DataTypes\Data.cpp" />
+    <ClCompile Include="src\nebula\DataTypes\poolTest.cpp" />
     <ClCompile Include="src\nebula\DataTypes\VariableScope.cpp" />
     <ClCompile Include="src\nebula\ErrorHandling\ErrorHandler.cpp" />
     <ClCompile Include="src\nebula\State\state.cpp" />

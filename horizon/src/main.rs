@@ -21,10 +21,9 @@ use crate::{
             Vec3
         }, 
         nebula::{
-            debug::{
+            data_pool, debug::{
                 self, NEB_ERROR_INFO, enable_debug_mode, print_error, set_error_pipe
-            }, 
-            neb
+            }, neb
         }
     }
 };
@@ -43,6 +42,7 @@ mod tools {
     pub mod nebula{
         pub mod neb;
         pub mod debug;
+        pub mod data_pool;
     }
 }
 
