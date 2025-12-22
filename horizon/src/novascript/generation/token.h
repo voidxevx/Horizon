@@ -31,9 +31,10 @@ namespace nova::gen
         //////////////////////
         // SUBROUTINE TYPES //
         //////////////////////
-        FunctionType, // function
-        MethodType,   // method
-        EventType,    // event
+        FunctionType,    // function
+        MethodType,      // method
+        EventType,       // event
+        ConstructorType, // constructor
 
         //////////////////////////
         // OBJECT EXPOSURE TYPE //
@@ -83,55 +84,56 @@ namespace nova::gen
     };
 
     static std::map<std::string, TokenType> s_TokenMap = {
-        {"struct",    TokenType::Structure},
+        {"struct", TokenType::Structure},
         {"component", TokenType::Component},
         {"interface", TokenType::Interface},
         {"archetype", TokenType::Archetype},
-        {"trait",     TokenType::Trait},
-        {"entity",    TokenType::Entity},
-        {"system",    TokenType::System},
+        {"trait", TokenType::Trait},
+        {"entity", TokenType::Entity},
+        {"system", TokenType::System},
 
         {"_archetypes:", TokenType::ArchetypeInclusion},
         {"_components:", TokenType::ComponentInclusion},
-        {"_systems:",    TokenType::SystemIncludion},
+        {"_systems:", TokenType::SystemIncludion},
 
         {"function", TokenType::FunctionType},
-        {"method",   TokenType::MethodType},
-        {"event",    TokenType::EventType},
+        {"method", TokenType::MethodType},
+        {"event", TokenType::EventType},
+        {"constructor", TokenType::ConstructorType},
 
-        {"public",  TokenType::ObjectExposurePublic},
+        {"public", TokenType::ObjectExposurePublic},
         {"private", TokenType::ObjectExposurePrivate},
 
-        {"(",  TokenType::ExpressionStart},
-        {")",  TokenType::ExpressionEnd},
-        {"{",  TokenType::ScopeStart},
-        {"}",  TokenType::ScopeEnd},
-        {"[",  TokenType::ListStart},
-        {"]",  TokenType::ListEnd},
-        {":",  TokenType::InstanceAccess},
+        {"(", TokenType::ExpressionStart},
+        {")", TokenType::ExpressionEnd},
+        {"{", TokenType::ScopeStart},
+        {"}", TokenType::ScopeEnd},
+        {"[", TokenType::ListStart},
+        {"]", TokenType::ListEnd},
+        {":", TokenType::InstanceAccess},
         {"::", TokenType::StaticAccess},
         {"->", TokenType::ReturnTypeHint},
-        {";",  TokenType::LineEnd},
+        {";", TokenType::LineEnd},
 
-        {"=",       TokenType::OperatorAssign},
-        {"+",       TokenType::OperatorAdd},
-        {"-",       TokenType::OperatorSubtract},
-        {"*",       TokenType::OperatorMultiply},
-        {"/",       TokenType::OperatorDivide},
-        {"create",  TokenType::OperatorCreate},
+        {"=", TokenType::OperatorAssign},
+        {"+", TokenType::OperatorAdd},
+        {"-", TokenType::OperatorSubtract},
+        {"*", TokenType::OperatorMultiply},
+        {"/", TokenType::OperatorDivide},
+        {"create", TokenType::OperatorCreate},
         {"destroy", TokenType::OperatorDestroy},
-        {"attach",  TokenType::OperatorAttach},
-        {"detach",  TokenType::OperatorDetach},
-        {"==",      TokenType::OperatorEquals},
-        {">",       TokenType::OperatorGreater},
-        {"<",       TokenType::OperatorLess},
-        {">=",      TokenType::OperatorGreaterEquals},
-        {"<=",      TokenType::OperatorLessEquals},
-        {"&&",      TokenType::OperatorAnd},
-        {"||",      TokenType::OperatorOr},
-        {"!",       TokenType::OperatorNot},
-        {"<<",      TokenType::OperatorLeftShift},
-        {">>",      TokenType::OperatorRightShift},
+        {"attach", TokenType::OperatorAttach},
+        {"detach", TokenType::OperatorDetach},
+        {"==", TokenType::OperatorEquals},
+        {">", TokenType::OperatorGreater},
+        {"<", TokenType::OperatorLess},
+        {">=", TokenType::OperatorGreaterEquals},
+        {"<=", TokenType::OperatorLessEquals},
+        {"&&", TokenType::OperatorAnd},
+        {"||", TokenType::OperatorOr},
+        {"!", TokenType::OperatorNot},
+        {"<<", TokenType::OperatorLeftShift},
+        {">>", TokenType::OperatorRightShift},
     };
 
     struct Token

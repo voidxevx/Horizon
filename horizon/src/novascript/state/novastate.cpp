@@ -10,10 +10,6 @@
 namespace nova
 {
 
-    State::State()
-    {
-    }
-
     std::shared_ptr<State>
     new_novastate()
     {

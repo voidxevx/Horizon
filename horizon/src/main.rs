@@ -1,5 +1,4 @@
-
-use std::pin::pin;
+use std::path::Path;
 
 use cxx::{CxxString, let_cxx_string};
 
@@ -9,7 +8,8 @@ use crate::{
         application::*, 
         mesh_data::buffer, 
         render_target::RENDER_TARGET_ORTHOGRAPHIC
-    ,}
+    }, 
+    tools::file_manager::nova_file_loader::nova_load_files,
 };
 
 mod tools {
@@ -17,6 +17,9 @@ mod tools {
         pub mod vector;
         pub mod matrix;
         pub mod transforms;
+    }
+    pub mod file_manager{
+        pub mod nova_file_loader;
     }
 }
 
@@ -59,15 +62,16 @@ fn main() {
     unsafe
     {
         let mut state = new_novastate();
-        let_cxx_string!(testmod = "test");
-        let_cxx_string!(testpath = "./content/scripts/test.ns");
-        state.pin_mut_unchecked().linkModule(&testmod, &testpath);
-        state.pin_mut_unchecked().loadModule(&testmod);
+        nova_load_files(state.clone(), Path::new(".\\content\\scripts"));
+        let_cxx_string!(root_mod = "root");
+        state.pin_mut_unchecked().loadModule(&root_mod);
+
+
+        // initialize graphics api and generate window handle
+        let handle = window_init("Horizon");
+        // start main game loop
+        window_event_loop(handle, RENDER_TARGET_ORTHOGRAPHIC);
     }
 
-    // initialize graphics api and generate window handle
-    let handle = unsafe { window_init("Horizon") };
 
-    // start main game loop
-    unsafe { window_event_loop(handle, RENDER_TARGET_ORTHOGRAPHIC); }
 }

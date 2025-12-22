@@ -14,15 +14,16 @@ namespace nova
         
     };
 
-    class State
+    class State final
     {
         using ModuleState = std::variant<std::string, ModulePackage>;
     public:
-        State();
+        State() = default;
 
         //////////////////
         // FILE LINKAGE //
         //////////////////
+
         void linkModule(const std::string& moduleName, const std::string& filePath);
         void loadModule(const std::string& moduleName);
         void loadModule(propID moduleID);
@@ -33,6 +34,7 @@ namespace nova
         /////////////////////////////
         // SOURCE FILE COMPILATION //
         /////////////////////////////
+        
         const gen::TokenPackage tokenizeFile(const std::string& filePath);
 
         // Loaded modules

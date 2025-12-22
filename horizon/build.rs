@@ -5,5 +5,5 @@ fn main() {
         .compile("nova-bridge");
 
     println!("cargo:rerun-if-changed=src/novascript/state/novastate.cpp");
-    println!("cargo:rerun-if-changed=build/novascript/state/novastate.h");
+    println!("cargo:rerun-if-changed=src/novascript/state/novastate.h");
 }
