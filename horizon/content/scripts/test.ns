@@ -1,0 +1,8 @@
+_mod: test
+
+_dep:
+
+_code:
+public function root()[] -> void {
+    
+}

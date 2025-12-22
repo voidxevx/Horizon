@@ -12,3 +12,7 @@ gl = "0.14.0"
 thiserror = "2.0.17"
 image = "0.25.8"
 lazy_static = "1.4.0"
+cxx = "1.0.192"
+
+[build-dependencies]
+cxx-build = "1.0.192"

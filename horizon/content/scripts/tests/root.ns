@@ -1,0 +1,107 @@
+_mod: root
+description of what this module is for.
+_dep:
+
+_code:
+// main function
+public function root()[] -> void {
+
+}
+
+public struct Resource {
+    private i32 CurrentValue;
+    private i32 MaxValue;
+
+    public constructor DamageResource(i32 maxValue, i32 initialValue) -> DamageResource {
+        this:CurrentValue = initialValue;
+        this:MaxValue = maxValue;
+        return this;
+    }
+
+    public method removeResource(i32 amount) -> void {
+        this:CurrentValue = math::max(CurrentValue - amout, 0);
+    }
+
+    public method gainResource(i32 amount) -> void {
+        this:CurrentValue = math::min(CurrentValue + amount, MaxValue);
+    }
+
+    public method setZero() -> void {
+        this:CurrentValue = 0;
+    }
+
+    public method getCurrent() -> i32 {
+        return this:CurrentValue;
+    }
+
+    public method getMax() -> i32 {
+        return this:MaxValue;
+    }
+}
+
+public component DamageComponent {
+    private Resource Health;
+    private Resource Shield;
+    private bool IsDead;
+
+    public constructor DamageComponent(i32 maxHealth, i32 maxShield) -> DamageComponent {
+        this:Health = Resource(maxHealth, maxHealth);
+        this:Shield = Resource(maxShield, maxShield);
+        this:IsDead = false;
+    }
+
+    public method takeDamage(i32 amount) -> void {
+        if (amount > this:Shield:getCurrent()) {
+            // break shields and or deal health damage;
+            i32 health_damage = amount - this:Shield:getCurrent();
+            this:Shield:setZero();
+            this:Health:removeResource(health_damage);
+        } else {
+            // shield damage only
+            this:Shield:removeResource(amount);
+        }
+    }
+}
+
+public interface IDamageAble[DamageComponent] {
+    public function TakeDamage(i32 amount)[] {
+        DamageComponent:takeDamage(amount);
+    }
+}
+
+public archetype ADamageAble {
+    _components: [DamageComponent]
+    _systems: []
+
+    public method takeDamage(i32 amount) -> void {
+        this:DamageComponent:takeDamage(amount);
+    }
+}
+
+public entity PlayerCharacter {
+    _archetypes: [ADamageAble]
+    _components: [std::MeshComponent]
+    _systems: [Tracked]
+
+    trait DebugTracker {
+        method debugPrint() -> string {
+            return "PlayerCharacter";
+        }
+    }
+}
+
+public system Characters [] {
+
+    event OnBegin {
+        // ...
+    }
+
+    event OnEnd {
+        // ...
+    }
+
+    event OnUpdate {
+        // ...
+    }
+
+}
