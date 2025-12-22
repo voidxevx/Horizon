@@ -1,8 +1,8 @@
 #pragma once
 
 #include <stdint.h>
-#include <xhash>
 #include <string>
+#include <functional>
 
 namespace nova
 {
@@ -14,5 +14,6 @@ namespace nova
         propID Type;
     };
 
+    [[maybe_unused]]
     static std::hash<std::string> s_PropertyHasher;
 }

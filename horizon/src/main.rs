@@ -61,11 +61,8 @@ fn main() {
         let mut state = new_novastate();
         let_cxx_string!(testmod = "test");
         let_cxx_string!(testpath = "./content/scripts/test.ns");
-        println!("[RS] linking module");
         state.pin_mut_unchecked().linkModule(&testmod, &testpath);
-        println!("loading module");
         state.pin_mut_unchecked().loadModule(&testmod);
-        println!("module loaded successfully");
     }
 
     // initialize graphics api and generate window handle

@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <fstream>
-#include <assert.h>
+#include <cassert>
 #include <sstream>
 
 #include <rust/cxx.h>
@@ -39,16 +39,15 @@ namespace nova
     State::loadModule(propID moduleID)
     {
         if (m_Modules.count(moduleID) > 0)
+        {
             if (std::holds_alternative<std::string>(m_Modules.at(moduleID)))
             {
                 const std::string path = std::get<std::string>(m_Modules.at(moduleID));
                 const gen::TokenPackage package = tokenizeFile(path);
-                printf("token count: %i\n", package.Tokens.size());
-                for (const auto& token : package.Tokens)
-                    printf("Token Type: %i\n", (int)token.Type);
                 // build tokens
                 // store module package
             }
+        }
         else
             printf("\033[33m** [NOVA][CPP] Unable to load module, module id not found.\033[0m\n");
     }
@@ -74,7 +73,7 @@ namespace nova
 
         std::ifstream file{};
         file.open(filePath);
-        assert(file.is_open(), "*** [NOVA][CPP] Unable to open nova source file!");
+        assert(file.is_open() && "*** [NOVA][CPP] Unable to open nova source file!");
 
         std::string buffer{};
 
@@ -121,7 +120,7 @@ namespace nova
                 else if (isalnum(c_char) || c_char == '_')
                 {
                     bool allow_symbols = c_char == '_';
-                    while(isalnum(c_char) || (allow_symbols && !isspace(c_char)) && index < buffer.size())
+                    while((isalnum(c_char) || (allow_symbols && !isspace(c_char))) && index < buffer.size())
                     {
                         tBuffer << c_char;
                         ++index;
