@@ -22,6 +22,7 @@ namespace nova::gen
         Trait,     // trait
         Entity,    // entity
         System,    // system
+        Filter,    // _filter:
 
         // object inclusion tags
         ArchetypeInclusion, // _archetypes:
@@ -47,6 +48,7 @@ namespace nova::gen
         /////////////
         ExpressionStart, // (
         ExpressionEnd,   // )
+        ExpressionBreak, // ,
         ScopeStart,      // {
         ScopeEnd,        // }
         ListStart,       // [
@@ -91,6 +93,7 @@ namespace nova::gen
         {"trait", TokenType::Trait},
         {"entity", TokenType::Entity},
         {"system", TokenType::System},
+        {"_filter:", TokenType::Filter},
 
         {"_archetypes:", TokenType::ArchetypeInclusion},
         {"_components:", TokenType::ComponentInclusion},
@@ -106,6 +109,7 @@ namespace nova::gen
 
         {"(", TokenType::ExpressionStart},
         {")", TokenType::ExpressionEnd},
+        {",", TokenType::ExpressionBreak},
         {"{", TokenType::ScopeStart},
         {"}", TokenType::ScopeEnd},
         {"[", TokenType::ListStart},
@@ -158,4 +162,5 @@ namespace nova::gen
         std::vector<Token> Tokens;
     };
 
+    std::string diagnoseToken(const TokenType token);
 }

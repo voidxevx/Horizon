@@ -62,10 +62,10 @@ fn main() {
     unsafe
     {
         let mut state = new_novastate();
-        nova_load_files(state.clone(), Path::new(".\\content\\scripts"));
+        nova_load_files(state.clone(), Path::new(".\\content\\scripts"))
+            .expect("Error while loading files.");
         let_cxx_string!(root_mod = "root");
         state.pin_mut_unchecked().loadModule(&root_mod);
-
 
         // initialize graphics api and generate window handle
         let handle = window_init("Horizon");

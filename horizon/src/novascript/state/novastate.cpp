@@ -5,8 +5,6 @@
 #include <cassert>
 #include <sstream>
 
-#include <rust/cxx.h>
-
 namespace nova
 {
 
@@ -40,12 +38,16 @@ namespace nova
             {
                 const std::string path = std::get<std::string>(m_Modules.at(moduleID));
                 const gen::TokenPackage package = tokenizeFile(path);
-                // build tokens
-                // store module package
+                ModulePackage mPackage = buildTokens(package, moduleID);
+                m_Modules[moduleID] = mPackage;
             }
         }
         else
-            printf("\033[33m** [NOVA][CPP] Unable to load module, module id not found.\033[0m\n");
+        {
+            printf("\033[33m** [NOVA][CPP] Unable to load module, module id not found (Module ID: %llu).\033[0m\n", moduleID);
+            if (moduleID == s_PropertyHasher("root"))
+                printf("\033[31m^^ [NOVA][CPP] Module failed to load was root\033[34m\t<<<\t(make sure that your root.ns file starts with the header _mod: root)\033[0m\n");
+        }
     }
 
 
@@ -69,11 +71,11 @@ namespace nova
 
         std::ifstream file{};
         file.open(filePath);
-        assert(file.is_open() && "*** [NOVA][CPP] Unable to open nova source file!");
+        assert(file.is_open() && "*** [NOVA][CPP] Unable to open nova source file! (File path: %s)", filePath);
 
         std::string buffer{};
 
-        // iteratr up to the dependencies list.
+        // iterate up to the dependencies list.
         while (std::getline(file, buffer) && buffer != "_dep:");
 
         // load dependant modules
@@ -179,4 +181,184 @@ namespace nova
         return package;
     }
 
+
+
+
+
+
+
+
+
+
+    ////////////////////////
+    // STRUCTURE BUILDING //
+    ////////////////////////
+
+    #define next c_token = package.Tokens[++index]
+    
+    ModulePackage
+    State::buildTokens(const gen::TokenPackage& package, const propID thisModule)
+    {
+        ModulePackage mPackage{};
+        size_t index{};
+        gen::Token c_token = package.Tokens[index];
+        ExposureType c_exposure = ExposureType::Private;
+
+        while (index < package.Tokens.size())
+        {
+            if (c_token.Type == gen::TokenType::ObjectExposurePublic)
+            {
+                c_exposure = ExposureType::Public;
+                next;
+                continue;
+            }
+            else if (c_token.Type == gen::TokenType::ObjectExposurePrivate)
+            {
+                c_exposure = ExposureType::Private;
+                next;
+                continue;
+            }
+
+            else if (c_token.Type == gen::TokenType::FunctionType)
+            {
+                next; // to function id
+                // TODO: parse function implementation
+                std::optional<obj::UncompiledFunctionImplementation> impl = parseFunction(package, index, thisModule, c_exposure);
+                if (impl.has_value())
+                {
+                    // TODO: create function if not already created + add the implementation
+                }
+                else
+                    printf("\033[33m^^ [NOVA][CPP] Error while parsing function implementation. (In module: %llu)\033[0m\n", thisModule);
+            }
+
+            c_exposure = ExposureType::Private;
+            next;
+        }
+
+        return mPackage;
+    }
+
+    std::optional<obj::UncompiledFunctionImplementation>
+    State::parseFunction(const gen::TokenPackage &package, size_t &index, const propID thisModule, ExposureType exposure)
+    {
+        gen::Token c_token = package.Tokens[index];
+        if (c_token.Value.has_value())
+        {
+            propID funcID = c_token.Value.value();
+            next; // to either input list, component list, return type, implementation, or line end if unimplemented (will generate info warning).
+
+            // input list
+            std::vector<Property> inputs;
+            if (c_token.Type == gen::TokenType::ExpressionStart)
+            {
+                next; // to first token of input type.
+                while (c_token.Type != gen::TokenType::ExpressionEnd)
+                {
+                    // skip on token if it is a break
+                    if (c_token.Type == gen::TokenType::ExpressionBreak) next;
+
+                    std::optional<Property> prop = parseProperty(package, index, thisModule);
+                    if (prop.has_value())
+                        inputs.push_back(prop.value());
+                    else 
+                    {  
+                        printf("\033[33m^^ [NOVA][CPP] Error while parsing property for function input. (function: %s)\033[0m\n", package.Identifiers.at(funcID));
+                        return std::nullopt;
+                    }
+                    next;
+                }
+                next; // to components list, return type, implementation, or line end.
+            }
+
+
+            // components list
+            std::vector<ObjectID> components;
+            if (c_token.Type == gen::TokenType::ListStart)
+            {
+                next; // to first token of component object
+                while (c_token.Type != gen::TokenType::ListEnd)
+                {
+                    // skip on token if it is a break
+                    if (c_token.Type == gen::TokenType::ExpressionBreak) next;
+
+                    std::optional<ObjectID> objID = parseObjectID(package, index, thisModule);
+                    if (objID.has_value())
+                        components.push_back(objID.value());
+                    else
+                    {
+                        printf("\033[33m^^ [NOVA][CPP] Error while parsing object for function component requirements. (function: %s)\033[0m\n", package.Identifiers.at(funcID));
+                        return std::nullopt;
+                    }
+                    next;
+                }
+                next;
+            }
+
+
+        }
+        else 
+        {
+            printf("\033[33m** [NOVA][CPP] Unexpected token found in function signature. found token: %s\n", gen::diagnoseToken(c_token.Type));
+            printf("\033[34m^^ [NOVA][CPP] Expected signature patern:\n>>\t\t\t%s function <identifier>(inputs...)[components...] {...}\033[0m\n", (exposure == ExposureType::Public ? "public" : "private"));
+            return std::nullopt;
+        }
+        
+    }
+
+    std::optional<Property>
+    State::parseProperty(const gen::TokenPackage &package, size_t &index, propID thisModule)
+    {
+        gen::Token c_token = package.Tokens[index];
+        if (c_token.Value.has_value() && c_token.Type == gen::TokenType::Identifier)
+        {
+            gen::Token c_token = package.Tokens[index];
+            std::optional<ObjectID> obj = parseObjectID(package, index, thisModule);
+            if (!obj.has_value())
+            {
+                printf("\033[33m^^ [NOVA][CPP] Error while parsing object identifier in property.\033[0m\n");
+                return std::nullopt;
+            }
+
+            next; // to name
+            propID propName;
+            if (c_token.Value.has_value() && c_token.Type == gen::TokenType::Identifier)
+            {
+                propName = c_token.Value.value();
+                Property prop{propName, obj.value()};
+                return prop;
+            }
+        }
+
+        printf("\033[33m** [NOVA][CPP] Error while parsing signature\n");
+        printf("\033[34m^^ [NOVA][CPP] Expected signatures:\n>>\t\t\t<module>::<object> <name> or <object> <name>\033[0m\n");
+        return std::nullopt;
+    }
+
+    std::optional<ObjectID>
+    State::parseObjectID(const gen::TokenPackage &package, size_t &index, propID thisModule)
+    {
+        gen::Token c_token = package.Tokens[index];
+        if (c_token.Value.has_value() && c_token.Type == gen::TokenType::Identifier)
+        {
+            propID moduleID = thisModule;
+            propID objectID = c_token.Value.value();
+            if (package.Tokens[index + 1].Type == gen::TokenType::StaticAccess)
+            {
+                moduleID = objectID;
+                next; // to static access
+                next; // to object id
+                if (c_token.Value.has_value() && c_token.Type == gen::TokenType::Identifier)
+                    objectID = c_token.Value.value();
+                else goto _parseObjectIDError;
+            }
+
+            return ObjectID{ objectID, moduleID };
+        }
+
+        _parseObjectIDError:
+        printf("\033[33m** [NOVA][CPP] Error while parsing object identifier\n");
+        printf("\033[34m^^ [NOVA][CPP] Expected signature:\n>>\t\t\t<module>::<object> or <object>\033[0m\n");
+        return std::nullopt;
+    }
 }

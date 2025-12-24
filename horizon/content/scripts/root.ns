@@ -1,8 +1,12 @@
-_mod: test module
+_mod: root
 
 _dep:
 
 _code:
 public function root()[] -> void {
     
+}
+
+private function greeting()[] -> void {
+
 }
