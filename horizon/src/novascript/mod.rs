@@ -6,12 +6,6 @@ use cxx::SharedPtr;
 pub mod nova {
 
 
-
-
-    extern "Rust" {
-
-    }
-
     unsafe extern "C++" {
         include!("horizon/src/novascript/state/novastate.h");
 

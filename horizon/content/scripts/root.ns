@@ -3,10 +3,10 @@ _mod: root
 _dep:
 
 _code:
-public function root()[] -> void {
-    
+public function root(){} -> void {
+
 }
 
-private function greeting()[] -> void {
+private function greeting(std::string personName)[test::printComponent] -> void {
 
 }

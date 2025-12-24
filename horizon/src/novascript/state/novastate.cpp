@@ -44,7 +44,7 @@ namespace nova
         }
         else
         {
-            printf("\033[33m** [NOVA][CPP] Unable to load module, module id not found (Module ID: %llu).\033[0m\n", moduleID);
+            printf("\033[33m** [NOVA][CPP] Unable to load module, module id not found (Module ID: %llu).\033[0m\n", (unsigned long long)moduleID);
             if (moduleID == s_PropertyHasher("root"))
                 printf("\033[31m^^ [NOVA][CPP] Module failed to load was root\033[34m\t<<<\t(make sure that your root.ns file starts with the header _mod: root)\033[0m\n");
         }
@@ -71,7 +71,7 @@ namespace nova
 
         std::ifstream file{};
         file.open(filePath);
-        assert(file.is_open() && "*** [NOVA][CPP] Unable to open nova source file! (File path: %s)", filePath);
+        assert(file.is_open() && "*** [NOVA][CPP] Unable to open nova source file!");
 
         std::string buffer{};
 
@@ -201,11 +201,14 @@ namespace nova
     {
         ModulePackage mPackage{};
         size_t index{};
+        // empty module
+        if (package.Tokens.size() == 0) return mPackage;
         gen::Token c_token = package.Tokens[index];
         ExposureType c_exposure = ExposureType::Private;
 
         while (index < package.Tokens.size())
         {
+            c_token = package.Tokens[index];
             if (c_token.Type == gen::TokenType::ObjectExposurePublic)
             {
                 c_exposure = ExposureType::Public;
@@ -229,11 +232,12 @@ namespace nova
                     // TODO: create function if not already created + add the implementation
                 }
                 else
-                    printf("\033[33m^^ [NOVA][CPP] Error while parsing function implementation. (In module: %llu)\033[0m\n", thisModule);
+                    printf("\033[33m^^ [NOVA][CPP] Error while parsing function implementation. (In module: %llu)\033[0m\n", (unsigned long long)thisModule);
             }
 
+
             c_exposure = ExposureType::Private;
-            next;
+            ++index;
         }
 
         return mPackage;
@@ -253,7 +257,7 @@ namespace nova
             if (c_token.Type == gen::TokenType::ExpressionStart)
             {
                 next; // to first token of input type.
-                while (c_token.Type != gen::TokenType::ExpressionEnd)
+                while (c_token.Type != gen::TokenType::ExpressionEnd && index < package.Tokens.size())
                 {
                     // skip on token if it is a break
                     if (c_token.Type == gen::TokenType::ExpressionBreak) next;
@@ -263,7 +267,7 @@ namespace nova
                         inputs.push_back(prop.value());
                     else 
                     {  
-                        printf("\033[33m^^ [NOVA][CPP] Error while parsing property for function input. (function: %s)\033[0m\n", package.Identifiers.at(funcID));
+                        printf("\033[33m^^ [NOVA][CPP] Error while parsing property for function input. (function: %s)\033[0m\n", package.Identifiers.at(funcID).c_str());
                         return std::nullopt;
                     }
                     next;
@@ -271,13 +275,12 @@ namespace nova
                 next; // to components list, return type, implementation, or line end.
             }
 
-
             // components list
             std::vector<ObjectID> components;
             if (c_token.Type == gen::TokenType::ListStart)
             {
                 next; // to first token of component object
-                while (c_token.Type != gen::TokenType::ListEnd)
+                while (c_token.Type != gen::TokenType::ListEnd && index < package.Tokens.size())
                 {
                     // skip on token if it is a break
                     if (c_token.Type == gen::TokenType::ExpressionBreak) next;
@@ -287,7 +290,7 @@ namespace nova
                         components.push_back(objID.value());
                     else
                     {
-                        printf("\033[33m^^ [NOVA][CPP] Error while parsing object for function component requirements. (function: %s)\033[0m\n", package.Identifiers.at(funcID));
+                        printf("\033[33m^^ [NOVA][CPP] Error while parsing object for function component requirements. (function: %s)\033[0m\n", package.Identifiers.at(funcID).c_str());
                         return std::nullopt;
                     }
                     next;
@@ -295,11 +298,11 @@ namespace nova
                 next;
             }
 
-
+            return std::nullopt;
         }
         else 
         {
-            printf("\033[33m** [NOVA][CPP] Unexpected token found in function signature. found token: %s\n", gen::diagnoseToken(c_token.Type));
+            printf("\033[33m** [NOVA][CPP] Unexpected token found in function signature. found token: %s\n", gen::diagnoseToken(c_token.Type).c_str());
             printf("\033[34m^^ [NOVA][CPP] Expected signature patern:\n>>\t\t\t%s function <identifier>(inputs...)[components...] {...}\033[0m\n", (exposure == ExposureType::Public ? "public" : "private"));
             return std::nullopt;
         }

@@ -3,7 +3,7 @@ fn main() {
         .file("src/novascript/state/novastate.cpp")
         .file("src/novascript/generation/token.cpp")
         .std("c++20")
-        .compile("nova-bridge");
+        .compile("novascript");
 
     println!("cargo:rerun-if-changed=src/novascript/state/novastate.cpp");
     println!("cargo:rerun-if-changed=src/novascript/state/novastate.h");
