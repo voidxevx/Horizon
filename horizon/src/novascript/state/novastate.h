@@ -42,7 +42,7 @@ namespace nova
 
         // OBJECT BUILDING
 
-        std::optional<obj::UncompiledFunctionImplementation> parseFunction(const gen::TokenPackage &package, size_t& index, const propID thisModule, ExposureType exposure);
+        std::optional<obj::UncompiledFunctionImplementation> parseFunction(propID& id, const gen::TokenPackage &package, size_t& index, const propID thisModule, ExposureType exposure);
         std::optional<Property> parseProperty(const gen::TokenPackage &package, size_t &index, propID thisModule);
         std::optional<ObjectID> parseObjectID(const gen::TokenPackage&, size_t& index, propID thisModule);
 

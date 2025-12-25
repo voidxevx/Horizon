@@ -4,6 +4,7 @@
 #include "../generation/token.h"
 
 #include <vector>
+#include <set>
 #include <functional>
 #include <variant>
 
@@ -16,20 +17,20 @@ namespace nova::obj
         virtual ~IFunctionImplementation() = default;
 
         inline void setReturnType(ObjectID type) { m_ReturnType = type; }
-        inline const ObjectID getReturnType() const { return m_ReturnType; }
+        inline ObjectID getReturnType() const { return m_ReturnType; }
 
         inline void setInputs(std::vector<Property> inputs) { m_Inputs = inputs; }
         inline const std::vector<Property>& getInputs() const { return m_Inputs; }
 
-        inline void setRequiredComponents(std::vector<ObjectID> components) { m_RequiredComponents = components; }
-        inline const std::vector<ObjectID>& getRequiredComponents() const { return m_RequiredComponents; }
+        inline void setRequiredComponents(std::set<ObjectID> components) { m_RequiredComponents = components; }
+        inline const std::set<ObjectID>& getRequiredComponents() const { return m_RequiredComponents; }
 
         inline void setExposureType(ExposureType type) { m_Exposure = type; }
         inline const ExposureType& getExposureType() const { return m_Exposure; }
 
     private:
         std::vector<Property> m_Inputs;
-        std::vector<ObjectID> m_RequiredComponents;
+        std::set<ObjectID> m_RequiredComponents;
         ObjectID m_ReturnType;
         ExposureType m_Exposure;
     };
@@ -37,7 +38,7 @@ namespace nova::obj
     class NativeFunctionImplementation : public IFunctionImplementation 
     {
     public:
-        NativeFunctionImplementation(std::vector<Property> inputs, ObjectID retType, std::vector<ObjectID> reqComponents, std::function<void()> lambda)
+        NativeFunctionImplementation(std::vector<Property> inputs, ObjectID retType, std::set<ObjectID> reqComponents, std::function<void()> lambda)
             : m_Function(lambda)
         {
             setReturnType(retType);

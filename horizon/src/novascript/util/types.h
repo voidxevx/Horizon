@@ -6,15 +6,29 @@
 
 namespace nova
 {
-    typedef uint64_t propID;
+    typedef uint32_t propID;
 
-    struct ObjectID 
+    typedef uint64_t ObjectID;
+
+    inline ObjectID 
+    makeObjectID(propID moduleID, propID itemID) 
     {
-        propID Name;
-        propID Module;
+        return ((uint64_t)moduleID << 32) | (uint64_t)itemID;
+    }
 
-        inline bool operator==(const ObjectID& other) { return this->Name == other.Name && this->Module == other.Module; }
-    };
+    inline propID 
+    ObjectID_getModule(ObjectID id)
+    {
+        return (uint32_t)(id >> 32) & 0xffffffff;
+    }
+
+    inline propID
+    ObjectID_getItem(ObjectID id)
+    {
+        return (uint32_t)id & 0xffffffff;
+    }
+
+
 
     struct Property
     {

@@ -225,11 +225,19 @@ namespace nova
             else if (c_token.Type == gen::TokenType::FunctionType)
             {
                 next; // to function id
-                // TODO: parse function implementation
-                std::optional<obj::UncompiledFunctionImplementation> impl = parseFunction(package, index, thisModule, c_exposure);
+                propID funcID = 0;
+                std::optional<obj::UncompiledFunctionImplementation> impl = parseFunction(funcID, package, index, thisModule, c_exposure);
                 if (impl.has_value())
                 {
                     // TODO: create function if not already created + add the implementation
+                    if (mPackage.m_GlobalFunctions.count(funcID) > 0)
+                        mPackage.m_GlobalFunctions[funcID].addImplementation(impl.value());
+                    else
+                    {
+                        obj::Function func = obj::Function{};
+                        func.addImplementation(impl.value());
+                        mPackage.m_GlobalFunctions.insert(funcID, func);
+                    }
                 }
                 else
                     printf("\033[33m^^ [NOVA][CPP] Error while parsing function implementation. (In module: %llu)\033[0m\n", (unsigned long long)thisModule);
@@ -244,12 +252,13 @@ namespace nova
     }
 
     std::optional<obj::UncompiledFunctionImplementation>
-    State::parseFunction(const gen::TokenPackage &package, size_t &index, const propID thisModule, ExposureType exposure)
+    State::parseFunction(propID& id, const gen::TokenPackage &package, size_t &index, const propID thisModule, ExposureType exposure)
     {
         gen::Token c_token = package.Tokens[index];
         if (c_token.Value.has_value())
         {
             propID funcID = c_token.Value.value();
+            id = funcID;
             next; // to either input list, component list, return type, implementation, or line end if unimplemented (will generate info warning).
 
             // input list
@@ -276,7 +285,7 @@ namespace nova
             }
 
             // components list
-            std::vector<ObjectID> components;
+            std::set<ObjectID> components;
             if (c_token.Type == gen::TokenType::ListStart)
             {
                 next; // to first token of component object
@@ -287,7 +296,7 @@ namespace nova
 
                     std::optional<ObjectID> objID = parseObjectID(package, index, thisModule);
                     if (objID.has_value())
-                        components.push_back(objID.value());
+                        components.insert(objID.value());
                     else
                     {
                         printf("\033[33m^^ [NOVA][CPP] Error while parsing object for function component requirements. (function: %s)\033[0m\n", package.Identifiers.at(funcID).c_str());
@@ -356,7 +365,7 @@ namespace nova
                 else goto _parseObjectIDError;
             }
 
-            return ObjectID{ objectID, moduleID };
+            return makeObjectID(moduleID, objectID);
         }
 
         _parseObjectIDError:
