@@ -35,8 +35,6 @@ namespace nova::gen
             return "method";
         case TokenType::EventType:
             return "event";
-        case TokenType::ConstructorType:
-            return "constructor";
         case TokenType::ObjectExposurePublic:
             return "public";
         case TokenType::ObjectExposurePrivate:
@@ -103,6 +101,8 @@ namespace nova::gen
             return "right shift operator";
         case TokenType::Identifier:
             return "identifier";
+        case TokenType::ModuleEnd:
+            return "module end";
         default:
             break;
         }

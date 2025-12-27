@@ -57,7 +57,7 @@ fn nova_load_module(mut state: SharedPtr<State>, module_path: &Path) -> io::Resu
                                             {
                                                 // link the module
                                                 state.pin_mut_unchecked().linkModule(&cxx_mod_name, &file_path_str);
-                                                println!("linked module: {:?}, from path: {:?}", cxx_mod_name, file_path_str);
+                                                // println!("linked module: {:?}, from path: {:?}", cxx_mod_name, file_path_str);
                                             }
                                         }
                                         Err(_) => (),

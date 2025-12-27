@@ -1,5 +1,7 @@
 #include "novastate.h"
 
+#include "../generation/nameJudger.h"
+
 #include <stdio.h>
 #include <fstream>
 #include <cassert>
@@ -19,7 +21,10 @@ namespace nova
     {
         propID id = s_PropertyHasher(moduleName);
         if (m_Modules.count(id) == 0)
+        {
             m_Modules[id] = filePath;
+            m_ModuleNames[id] = moduleName;
+        }
     }
 
     void
@@ -44,7 +49,7 @@ namespace nova
         }
         else
         {
-            printf("\033[33m** [NOVA][CPP] Unable to load module, module id not found (Module ID: %llu).\033[0m\n", (unsigned long long)moduleID);
+            printf("\033[33m** [NOVA][CPP] Unable to load module, module id not found (Module: %s).\033[0m\n", m_ModuleNames[moduleID].c_str());
             if (moduleID == s_PropertyHasher("root"))
                 printf("\033[31m^^ [NOVA][CPP] Module failed to load was root\033[34m\t<<<\t(make sure that your root.ns file starts with the header _mod: root)\033[0m\n");
         }
@@ -118,7 +123,8 @@ namespace nova
                 else if (isalnum(c_char) || c_char == '_')
                 {
                     bool allow_symbols = c_char == '_';
-                    while((isalnum(c_char) || (allow_symbols && !isspace(c_char))) && index < buffer.size())
+
+                    while ((isalnum(c_char) || c_char == '_' || (allow_symbols && !isspace(c_char))) && index < buffer.size())
                     {
                         tBuffer << c_char;
                         ++index;
@@ -225,28 +231,49 @@ namespace nova
             else if (c_token.Type == gen::TokenType::FunctionType)
             {
                 next; // to function id
-                propID funcID = 0;
+                propID funcID {};
                 std::optional<obj::UncompiledFunctionImplementation> impl = parseFunction(funcID, package, index, thisModule, c_exposure);
                 if (impl.has_value())
                 {
-                    // TODO: create function if not already created + add the implementation
+                    judge::judgeFunctionName(funcID, package, false, c_exposure);
                     if (mPackage.m_GlobalFunctions.count(funcID) > 0)
                         mPackage.m_GlobalFunctions[funcID].addImplementation(impl.value());
                     else
                     {
                         obj::Function func = obj::Function{};
                         func.addImplementation(impl.value());
-                        mPackage.m_GlobalFunctions.insert(funcID, func);
+                        mPackage.m_GlobalFunctions.emplace(funcID, func);
                     }
+                    c_exposure = ExposureType::Private;
+                    continue;
                 }
                 else
-                    printf("\033[33m^^ [NOVA][CPP] Error while parsing function implementation. (In module: %llu)\033[0m\n", (unsigned long long)thisModule);
+                    printf("\033[33m^^ [NOVA][CPP] Error while parsing function implementation. (module: %s)\033[0m\n", m_ModuleNames[thisModule].c_str());
+            }
+
+            else if (c_token.Type == gen::TokenType::Structure)
+            {
+                next;
+                propID structID{};
+                std::optional<obj::Structure> stru = parseStructure(structID, package, index, thisModule, c_exposure);
+                if (stru.has_value())
+                {
+                    if (mPackage.m_Structures.count(structID) > 0)
+                        printf("\033[33m** [NOVA][CPP] Defined structure already exists in this module. (struct: %s, module: %s)\033[0m\n", package.Identifiers.at(structID).c_str(), package.Identifiers.at(thisModule).c_str());
+                    else
+                        mPackage.m_Structures.emplace(structID, stru.value());
+                }
+                else
+                    printf("\033[33m^^ [NOVA][CPP] Error while parsing structure. (module: %s)\033[0m\n", m_ModuleNames[thisModule].c_str());
             }
 
 
             c_exposure = ExposureType::Private;
             ++index;
         }
+
+        if (package.Tokens.back().Type != gen::TokenType::ModuleEnd)
+            printf("\033[33m** [NOVA][CPP] Module %s does not end with module terminator (_;) module should end with a terminator to avoid issues during parsing.\033[0m\n", m_ModuleNames[thisModule].c_str());
 
         return mPackage;
     }
@@ -255,7 +282,7 @@ namespace nova
     State::parseFunction(propID& id, const gen::TokenPackage &package, size_t &index, const propID thisModule, ExposureType exposure)
     {
         gen::Token c_token = package.Tokens[index];
-        if (c_token.Value.has_value())
+        if (c_token.Value.has_value() && c_token.Type == gen::TokenType::Identifier)
         {
             propID funcID = c_token.Value.value();
             id = funcID;
@@ -304,10 +331,73 @@ namespace nova
                     }
                     next;
                 }
-                next;
+                next; // to return type, implementation, or endline.
             }
 
-            return std::nullopt;
+            ObjectID returnType = 0;
+            if (c_token.Type == gen::TokenType::ReturnTypeHint)
+            {
+                next; // to type
+                if (c_token.Type == gen::TokenType::Identifier && c_token.Value.has_value())
+                {
+                    std::optional<ObjectID> obj = parseObjectID(package, index, thisModule);
+                    if (obj.has_value())
+                    {
+                        returnType = obj.value();
+                    }
+                    else
+                    {
+                        printf("\033[33m^^ [NOVA][CPP] Error while parsing object for function return type. (function: %s)\033[0m\n", package.Identifiers.at(funcID).c_str());
+                    }
+                }
+                else
+                {
+                    printf("\033[33m** [NOVA][CPP] Unexpected token following function type hint. (Found token: %s)\n", gen::diagnoseToken(c_token.Type).c_str());
+                    printf("\033[34m^^ Expected signature pattern:\n>>>\t\t\t%s function %s(...)[...] -> <type or void> {...}\033[0m\n", (exposure == ExposureType::Public ? "public" : "private"), package.Identifiers.at(funcID).c_str());
+                    return std::nullopt;
+                }
+                next; // to implementation or endline
+            }
+
+            if (c_token.Type == gen::TokenType::LineEnd)
+            {
+                printf("\033[34m* [NOVA][CPP] TODO: Unimplemented function: %s (module: %s)\033[0m\n", package.Identifiers.at(funcID).c_str(), m_ModuleNames[thisModule].c_str());
+                obj::UncompiledFunctionImplementation impl = obj::UncompiledFunctionImplementation(package, 0, 0);
+                impl.setExposureType(exposure);
+                impl.setInputs(inputs);
+                impl.setRequiredComponents(components);
+                impl.setReturnType(returnType);
+                next; // push to next token
+                return impl;
+            }
+            else if (c_token.Type == gen::TokenType::ScopeStart)
+            {
+                next; // to first token
+                size_t start = index;
+                int scopes = 1;
+                while (scopes != 0 && index < package.Tokens.size())
+                {
+                    if (c_token.Type == gen::TokenType::ScopeStart)
+                        ++scopes;
+                    else if (c_token.Type == gen::TokenType::ScopeEnd)
+                        --scopes;
+                    next; // push to next token after the scope end.
+                }
+                size_t end = index - 2; // subtract the current token and the scope end.
+
+                obj::UncompiledFunctionImplementation impl = obj::UncompiledFunctionImplementation(package, start, end);
+                impl.setExposureType(exposure);
+                impl.setInputs(inputs);
+                impl.setRequiredComponents(components);
+                impl.setReturnType(returnType);
+                return impl;
+            }
+            else 
+            {
+                printf("\033[33m** [NOVA][CPP] Unexpected token following function signature. Expected scope or line end found: %s. (function: %s)\033[0m\n", gen::diagnoseToken(c_token.Type).c_str(), package.Identifiers.at(funcID).c_str());
+                return std::nullopt;
+            }
+
         }
         else 
         {
@@ -342,7 +432,7 @@ namespace nova
             }
         }
 
-        printf("\033[33m** [NOVA][CPP] Error while parsing signature\n");
+        printf("\033[33m** [NOVA][CPP] Error while parsing property signature\n");
         printf("\033[34m^^ [NOVA][CPP] Expected signatures:\n>>\t\t\t<module>::<object> <name> or <object> <name>\033[0m\n");
         return std::nullopt;
     }
@@ -364,8 +454,10 @@ namespace nova
                     objectID = c_token.Value.value();
                 else goto _parseObjectIDError;
             }
+            else if (package.Tokens[index + 1].Type == gen::TokenType::InstanceAccess)
+                printf("\033[34m* [NOVA][CPP] A instance access (:) was found where a static access (::) could be, an error will likely follow.\033[0m\n");
 
-            return makeObjectID(moduleID, objectID);
+                return makeObjectID(moduleID, objectID);
         }
 
         _parseObjectIDError:
@@ -373,4 +465,119 @@ namespace nova
         printf("\033[34m^^ [NOVA][CPP] Expected signature:\n>>\t\t\t<module>::<object> or <object>\033[0m\n");
         return std::nullopt;
     }
+
+    std::optional<obj::Structure>
+    State::parseStructure(propID &id, const gen::TokenPackage &package, size_t &index, const propID thisModule, ExposureType exposure)
+    {
+        gen::Token c_token = package.Tokens[index];
+        if (!(c_token.Value.has_value() || c_token.Type == gen::TokenType::Identifier))
+        {
+            printf("\033[33m** [NOVA][CPP] Unexpected token found in structure header. found token: %s\n", gen::diagnoseToken(c_token.Type).c_str());
+            printf("\033[34m^^ [NOVA][CPP] Expected header pattern:\n>>>\t\t\t%s struct <identifier> {...}\033[0m\n", (exposure == ExposureType::Public ? "public" : "private"));
+            return std::nullopt;
+        }
+
+        propID structID = c_token.Value.value();
+        judge::judgeObjectName(structID, package, ObjectType::Structure, exposure);
+        id = structID;
+        next;
+
+        // unimplemented warning
+        if (c_token.Type == gen::TokenType::LineEnd)
+        {
+            printf("\033[34m* [NOVA][CPP] TODO: Unimplemented structure: %s (module: %s)\033[0m\n", package.Identifiers.at(structID).c_str(), m_ModuleNames[thisModule].c_str());
+            return obj::Structure{};
+        }
+        else if (c_token.Type == gen::TokenType::ScopeStart)
+        {
+            obj::Structure stru{};
+            next;
+            ExposureType c_exposure = ExposureType::Private;
+            bool hasConstructor = false;
+            unsigned int propCount{};
+
+            while (c_token.Type != gen::TokenType::ScopeEnd && index < package.Tokens.size())
+            {
+                if (c_token.Type == gen::TokenType::ObjectExposurePrivate)
+                {
+                    c_exposure = ExposureType::Private;
+                    next;
+                    continue;
+                }
+                else if (c_token.Type == gen::TokenType::ObjectExposurePublic)
+                {
+                    c_exposure = ExposureType::Public;
+                    next;
+                    continue;
+                }
+
+                // properties
+                else if (c_token.Type == gen::TokenType::Identifier)
+                {
+                    std::optional<Property> prop = parseProperty(package, index, thisModule);
+                    if (prop.has_value())
+                    {
+                        Property prop_v = prop.value();
+                        judge::judgePropertyName(prop_v.Name, package, c_exposure);
+                        stru.addProperty(prop_v.Name, prop_v.Type, c_exposure);
+                        ++propCount;
+                    }
+                    else 
+                    {
+                        printf("\033[33m^^ [NOVA][CPP] Error while parsing property for structure: %s\033[0m\n", package.Identifiers.at(structID).c_str());
+                        return std::nullopt;
+                    }
+                }
+
+                else if (c_token.Type == gen::TokenType::MethodType)
+                {
+                    next; // to identifier
+                    propID methodID{};
+                    std::optional<obj::UncompiledFunctionImplementation> method = parseFunction(methodID, package, index, thisModule, c_exposure);
+                    if (method.has_value())
+                    {
+                        judge::judgeFunctionName(methodID, package, true, c_exposure);
+                        if (method.value().getRequiredComponents().size() > 0)
+                            printf("\033[34m* [NOVA][CPP] Entities cannot be passed into methods. The required components list will be ignored. (method: %s, struct: %s)\033[0m\n", package.Identifiers.at(methodID).c_str(), package.Identifiers.at(structID).c_str());
+                        stru.addMethod(methodID, method.value());
+                        c_token = package.Tokens[index];
+                        if (!hasConstructor && methodID == (propID)s_PropertyHasher("_alloc:") && c_exposure == ExposureType::Private)
+                            hasConstructor = true;
+                        continue;
+                    }
+                    else
+                    {
+                        printf("\033[33m^^ [NOVA][CPP] Error while parsing method for structure: %s\033[0m\n", package.Identifiers.at(structID).c_str());
+                        return std::nullopt;
+                    }
+                }
+
+                else 
+                {
+                    printf("\033[33m** [NOVA][CPP] Unexpected object found in structure body. (structure: %s) Token found: %s\033[0m\n", package.Identifiers.at(structID).c_str(), gen::diagnoseToken(c_token.Type).c_str());
+                    if (c_token.Type == gen::TokenType::FunctionType)
+                        printf("\033[34m^^ [NOVA][CPP] structures cannot implement functions try replacing function with method.\033[0m\n");
+                }
+                
+                c_exposure = ExposureType::Private;
+                next;
+            }
+
+            if (!hasConstructor)
+                printf("\033[34m* [NOVA][CPP] Structure does not implement any constructor. Add a private method called _alloc: to define the structure. (structure: %s)\033[0m\n", package.Identifiers.at(structID).c_str());
+
+            if (propCount == 0)
+                printf("\033[34m* [NOVA][CPP] Structure contains no properties. (structure: %s)\033[0m\n", package.Identifiers.at(structID).c_str());
+
+            return stru;
+        }
+        else 
+        {
+            printf("\033[33m** [NOVA][CPP] Unexpected token following structure header. Expected Scope start or line end. found token: %s (structure: %s)\033[0m\n", gen::diagnoseToken(c_token.Type).c_str(), package.Identifiers.at(structID).c_str());
+            return std::nullopt;
+        }
+
+    }
+
+
 }

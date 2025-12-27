@@ -35,7 +35,6 @@ namespace nova::gen
         FunctionType,    // function
         MethodType,      // method
         EventType,       // event
-        ConstructorType, // constructor
 
         //////////////////////////
         // OBJECT EXPOSURE TYPE //
@@ -81,6 +80,7 @@ namespace nova::gen
         OperatorLeftShift,     // <<
         OperatorRightShift,    // >>
 
+        ModuleEnd, // _;
 
         Identifier, // non keyword
     };
@@ -102,7 +102,6 @@ namespace nova::gen
         {"function", TokenType::FunctionType},
         {"method", TokenType::MethodType},
         {"event", TokenType::EventType},
-        {"constructor", TokenType::ConstructorType},
 
         {"public", TokenType::ObjectExposurePublic},
         {"private", TokenType::ObjectExposurePrivate},
@@ -138,6 +137,8 @@ namespace nova::gen
         {"!", TokenType::OperatorNot},
         {"<<", TokenType::OperatorLeftShift},
         {">>", TokenType::OperatorRightShift},
+
+        {"_;", TokenType::ModuleEnd},
     };
 
     struct Token

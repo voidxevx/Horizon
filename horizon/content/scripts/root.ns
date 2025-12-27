@@ -1,11 +1,32 @@
 _mod: root
+Root module for novascript tests
 _dep:
 
 _code:
-public function root(){} -> void {
+function root {
+    Person myPerson("person", 32);
+}
+
+public struct Person {
+    private std::string _$name
+    public i32 age
+
+    // constructor
+    private method _alloc: (std::string name, i32 age) {
+        this:_$name = name;
+        this:age = age;
+    }
+
+    // getter method
+    public method getName -> std::string {
+        return this:_$name;
+    }
+
+    // setter method
+    public method setName(std::string name) {
+        this:_$name = name;
+    }
 
 }
 
-private function greeting(std::string personName)[test::printComponent] -> void {
-
-}
+_;
